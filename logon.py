@@ -1,64 +1,165 @@
+from distutils.log import error
+import webbrowser
 from PyQt5 import uic, QtWidgets
 import sqlite3
 
+class Interface:
+    def __init__(self, primeira_tela, segunda_tela, tela_cadastro, tela_admin):
+        self.primeira_tela= uic.loadUi(primeira_tela)
+        self.primeira_tela.pushButton.clicked.connect(self.logar)
+        self.primeira_tela.label_3.setText("")
+        self.primeira_tela.lineEdit_2.setEchoMode(QtWidgets.QLineEdit.Password)
+        self.primeira_tela.pushButton_2.clicked.connect(self.abrir_git)
 
-def chama_segunda_tela():
-    primeira_tela.label_3.setText("")
-    nome_usuario = primeira_tela.lineEdit.text()
-    senha = primeira_tela.lineEdit_2.text()
-    if nome_usuario == "vitor" and senha == "123456" :
-        primeira_tela.close()
-        segunda_tela.show()
-    else :
-        primeira_tela.label_3.setText("Dados de login incorretos!")
-    
+        self.segunda_tela = uic.loadUi(segunda_tela)
+        self.segunda_tela.pushButton.clicked.connect(self.logout)
+        
+        self.tela_cadastro = uic.loadUi(tela_cadastro)
+        self.tela_cadastro.erro.setText("")
+        self.tela_cadastro.cadastrado.setText("")
+        self.tela_cadastro.botao_cadastro.clicked.connect(self.cadastrar)
 
-def logout():
-    segunda_tela.close()
-    primeira_tela.show()
-
-# def abre_tela_cadastro():
-#     tela_cadastro.show()
-
-
-# def cadastrar():
-#     nome = tela_cadastro.lineEdit.text()
-#     login = tela_cadastro.lineEdit_2.text()
-#     senha = tela_cadastro.lineEdit_3.text()
-#     c_senha = tela_cadastro.lineEdit_4.text()
-
-#     if (senha == c_senha):
-#         try:
-#             banco = sqlite3.connect('banco_cadastro.db') 
-#             cursor = banco.cursor()
-#             cursor.execute("CREATE TABLE IF NOT EXISTS cadastro (nome text,login text,senha text)")
-#             cursor.execute("INSERT INTO cadastro VALUES ('"+nome+"','"+login+"','"+senha+"')")
-
-#             banco.commit() 
-#             banco.close()
-#             tela_cadastro.label.setText("Usuario cadastrado com sucesso")
-
-#         except sqlite3.Error as erro:
-#             print("Erro ao inserir os dados: ",erro)
-#     else:
-#         tela_cadastro.label.setText("As senhas digitadas estão diferentes")
-    
+        self.tela_admin = uic.loadUi(tela_admin)
+        self.tela_admin.botao_deslogar.clicked.connect(self.logout)
+        self.tela_admin.botao_cadastrar.clicked.connect(self.cadastro_tela)
+        
 
     
+    def iniciar_tela_admin(self):
+        self.tela_admin.show()
+    
+    def fechar_tela_admin(self):
+        self.tela_admin.close()
 
+    def iniciar_primeira_tela(self):
+        self.primeira_tela.show()
+    
+    def iniciar_segunda_tela(self):
+        self.segunda_tela.show()
+
+    def fechar_primeria_tela(self):
+        self.primeira_tela.close()
+
+    def fechar_segunda_tela(self):
+        self.segunda_tela.close()
+    
+    def iniciar_tela_cadastro(self):
+        self.tela_cadastro.show()
+
+    def fechar_tela_cadastro(self):
+        self.tela_cadastro.close()
+
+    def fecha_primeira_tela_abre_segunda_tela(self):
+        self.fechar_primeria_tela()
+        self.iniciar_segunda_tela()
+
+    def abrir_git(self):
+        webbrowser.open_new_tab('https://github.com/vbsx')
+    
+    def mostrar_erro_banco_primeira_tela(self):
+        self.primeira_tela.label_3.setText("Exeção banco de dados")
+
+    def erro_usuario_senha(self):
+        self.primeira_tela.label_3.setText("Usuário ou senha inválidos!")
+
+        
+    def coleta_banco(self):
+        self.nome_usuario = self.primeira_tela.lineEdit.text()
+
+        self.banco = sqlite3.connect('banco_cadastro.db')
+        self.cursor = self.banco.cursor()
+        self.cursor.execute("SELECT senha FROM cadastro WHERE login ='{}'".format(self.nome_usuario))
+        self.senha_db = self.cursor.fetchall()
+        self.banco.close()
+    
+    def verificar_admin(self):
+        if self.nome_usuario == "admin":
+            return True
+        else:
+            return False
+
+    def verificar_senha(self):
+        self.senha = self.primeira_tela.lineEdit_2.text()
+        try:
+            if self.senha == self.senha_db[0][0]:
+                #self.fecha_primeira_tela_abre_segunda_tela()
+                return True
+        except:
+            return self.primeira_tela.label_3.setText("Dados de login incorretos!")
+    
+    def logar(self):
+        
+        try:
+            self.coleta_banco()
+        except sqlite3.Error as erro:
+            print("Erro ao inserir os dados: ",erro)
+
+        if self.verificar_admin() == True and self.verificar_senha() == True:
+            self.iniciar_tela_admin()
+            self.admin_tela()
+            self.fechar_primeria_tela()
+
+        else:        
+            
+            if self.verificar_senha() == True:
+                self.fecha_primeira_tela_abre_segunda_tela()
+            else:
+                self.primeira_tela.label_3.setText("Dados de login incorretos!")
+    
+    def cadastrar_user_banco(self):
+        try:
+            self.banco = sqlite3.connect('banco_cadastro.db') 
+            self.cursor = self.banco.cursor()
+            self.cursor.execute("CREATE TABLE IF NOT EXISTS cadastro (nome text,login text,senha text)")
+            self.cursor.execute(f"INSERT INTO cadastro VALUES ('"+{self.nome_cadastro}+"','"+{self.login_cadastro}+"','"+{self.senha_cadastro}+"')")
+            
+            self.banco.commit() 
+            self.banco.close()
+            self.tela_cadastro.cadastrado.setText("Usuario cadastrado com sucesso")
+        except sqlite3.Error as erro:
+            print("Erro ao inserir os dados: ",erro)
+            return erro
+
+    
+    def verificar_senha_cadastro(self):
+        if self.senha_cadastro == self.confimacao_senha_cadastro:
+            return True
+        else:
+            self.tela_cadastro.erro.setText("As senhas não conferem!")
+
+    def cadastrar(self):
+        self.verificar_senha_cadastro()
+
+        try:
+            if self.verificar_senha_cadastro == True:
+                self.cadastrar_user_banco()
+        except:
+            self.tela_cadastro.erro.setText("Erro de banco")
+    
+    def cadastro_tela(self):
+        self.iniciar_tela_cadastro()
+        # self.tela_cadastro.senha.setEchoMode(QtWidgets.QLineEdit.Password)
+        # self.tela_cadastro.confirmar_senha.setEchoMode(QtWidgets.QLineEdit.Password)
+        self.nome_cadastro = self.tela_cadastro.nome.text()
+        self.login_cadastro = self.tela_cadastro.login.text()
+        self.senha_cadastro = self.tela_cadastro.senha.text()
+        self.confimacao_senha_cadastro = self.tela_cadastro.confirmar_senha.text()
+        
+
+            
+    def admin_tela(self):
+        self.tela_admin.label_2.setText(f"{self.nome_usuario}")
+
+    def logout(self):
+        self.fechar_segunda_tela()
+        self.fechar_tela_admin()
+        self.fechar_tela_cadastro()
+        self.iniciar_primeira_tela()
+
+    
 
 app=QtWidgets.QApplication([])
-primeira_tela=uic.loadUi("Tela_Inicial.ui")
-segunda_tela = uic.loadUi("segunda_tela.ui")
-#tela_cadastro = uic.loadUi("tela_cadastro.ui")
-primeira_tela.pushButton.clicked.connect(chama_segunda_tela)
-segunda_tela.pushButton.clicked.connect(logout)
-primeira_tela.lineEdit_2.setEchoMode(QtWidgets.QLineEdit.Password)
-#primeira_tela.pushButton_2.clicked.connect(abre_tela_cadastro)
-#tela_cadastro.pushButton.clicked.connect(cadastrar) 
+iniciar_interface = Interface(f"Tela_Inicial.ui", "segunda_tela.ui", "tela_cadastro.ui", "tela_admin.ui")
+iniciar_interface.iniciar_primeira_tela()
 
-
-primeira_tela.show()
 app.exec()
-        
-        
