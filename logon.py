@@ -1,4 +1,3 @@
-from distutils.log import error
 import webbrowser
 from PyQt5 import uic, QtWidgets
 import sqlite3
@@ -145,7 +144,9 @@ class Interface:
         self.senha_cadastro = self.tela_cadastro.senha.text()
         self.confimacao_senha_cadastro = self.tela_cadastro.confirmar_senha.text()
         
-
+    def limpar_user_senha(self):
+        self.primeira_tela.lineEdit.setText("")
+        self.primeira_tela.lineEdit_2.setText("")
             
     def admin_tela(self):
         self.tela_admin.label_2.setText(f"{self.nome_usuario}")
@@ -155,6 +156,7 @@ class Interface:
         self.fechar_tela_admin()
         self.fechar_tela_cadastro()
         self.iniciar_primeira_tela()
+        self.limpar_user_senha()
 
     
 
