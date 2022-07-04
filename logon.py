@@ -61,7 +61,6 @@ class Interface:
     def erro_usuario_senha(self):
         self.primeira_tela.label_3.setText("Usuário ou senha inválidos!")
 
-        
     def coleta_banco(self):
         self.nome_usuario = self.primeira_tela.lineEdit.text()
 
@@ -71,6 +70,9 @@ class Interface:
         self.senha_db = self.cursor.fetchall()
         self.banco.close()
     
+    def erro_usuario_incorreto(self):
+        self.primeira_tela.label_3.setText("Dados de login incorretos!")
+
     def verificar_admin(self):
         if self.nome_usuario == "admin":
             return True
@@ -84,8 +86,15 @@ class Interface:
                 #self.fecha_primeira_tela_abre_segunda_tela()
                 return True
         except:
-            return self.primeira_tela.label_3.setText("Dados de login incorretos!")
+            return self.erro_usuario_incorreto()
     
+    def validar_usuario(self):
+        if self.verificar_senha() == True:
+            self.fecha_primeira_tela_abre_segunda_tela()
+            
+        else:
+            return self.erro_usuario_incorreto()
+
     def logar(self):
         
         try:
@@ -99,11 +108,8 @@ class Interface:
             self.fechar_primeria_tela()
 
         else:        
+            self.validar_usuario()
             
-            if self.verificar_senha() == True:
-                self.fecha_primeira_tela_abre_segunda_tela()
-            else:
-                self.primeira_tela.label_3.setText("Dados de login incorretos!")
     
     def cadastrar_user_banco(self):
         try:
@@ -163,5 +169,6 @@ class Interface:
 app=QtWidgets.QApplication([])
 iniciar_interface = Interface(f"Tela_Inicial.ui", "segunda_tela.ui", "tela_cadastro.ui", "tela_admin.ui")
 iniciar_interface.iniciar_primeira_tela()
+
 
 app.exec()
