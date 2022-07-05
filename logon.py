@@ -107,7 +107,10 @@ class Interface:
             self.validar_usuario()
             
     def cadastrar_user_banco(self):
+        self.nome_cadastro = self.tela_cadastro.nome.text()
+        self.login_cadastro = self.tela_cadastro.login.text()
         try:
+            
             self.banco = sqlite3.connect('banco_cadastro.db') 
             self.cursor = self.banco.cursor()
             self.cursor.execute("INSERT INTO cadastro VALUES ('"+self.nome_cadastro+"','"+self.login_cadastro+"','"+self.senha_cadastro+"')")
@@ -138,8 +141,8 @@ class Interface:
         self.iniciar_tela_cadastro()
         # self.tela_cadastro.senha.setEchoMode(QtWidgets.QLineEdit.Password)
         # self.tela_cadastro.confirmar_senha.setEchoMode(QtWidgets.QLineEdit.Password)
-        self.nome_cadastro = self.tela_cadastro.nome.text()
-        self.login_cadastro = self.tela_cadastro.login.text()
+        
+        
         
     def limpar_user_senha(self):
         self.primeira_tela.lineEdit.setText("")
