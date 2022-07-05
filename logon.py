@@ -22,8 +22,6 @@ class Interface:
         self.tela_admin.botao_deslogar.clicked.connect(self.logout)
         self.tela_admin.botao_cadastrar.clicked.connect(self.cadastro_tela)
         
-
-    
     def iniciar_tela_admin(self):
         self.tela_admin.show()
     
@@ -110,14 +108,11 @@ class Interface:
         else:        
             self.validar_usuario()
             
-    
     def cadastrar_user_banco(self):
         try:
             self.banco = sqlite3.connect('banco_cadastro.db') 
             self.cursor = self.banco.cursor()
-            self.cursor.execute("CREATE TABLE IF NOT EXISTS cadastro (nome text,login text,senha text)")
-            self.cursor.execute(f"INSERT INTO cadastro VALUES ('"+{self.nome_cadastro}+"','"+{self.login_cadastro}+"','"+{self.senha_cadastro}+"')")
-            
+            self.cursor.execute("INSERT INTO cadastro VALUES ('"+self.nome_cadastro+"','"+self.login_cadastro+"','"+self.senha_cadastro+"')")
             self.banco.commit() 
             self.banco.close()
             self.tela_cadastro.cadastrado.setText("Usuario cadastrado com sucesso")
@@ -125,8 +120,9 @@ class Interface:
             print("Erro ao inserir os dados: ",erro)
             return erro
 
-    
     def verificar_senha_cadastro(self):
+        self.senha_cadastro = self.tela_cadastro.senha.text()
+        self.confimacao_senha_cadastro = self.tela_cadastro.confirmar_senha.text()
         if self.senha_cadastro == self.confimacao_senha_cadastro:
             return True
         else:
@@ -134,21 +130,18 @@ class Interface:
 
     def cadastrar(self):
         self.verificar_senha_cadastro()
+        print('ja verificou a senha')
 
-        try:
-            if self.verificar_senha_cadastro == True:
-                self.cadastrar_user_banco()
-        except:
-            self.tela_cadastro.erro.setText("Erro de banco")
-    
+        if self.verificar_senha_cadastro() == True:
+            print('abrindo o cadastro')
+            self.cadastrar_user_banco()
+        
     def cadastro_tela(self):
         self.iniciar_tela_cadastro()
         # self.tela_cadastro.senha.setEchoMode(QtWidgets.QLineEdit.Password)
         # self.tela_cadastro.confirmar_senha.setEchoMode(QtWidgets.QLineEdit.Password)
         self.nome_cadastro = self.tela_cadastro.nome.text()
         self.login_cadastro = self.tela_cadastro.login.text()
-        self.senha_cadastro = self.tela_cadastro.senha.text()
-        self.confimacao_senha_cadastro = self.tela_cadastro.confirmar_senha.text()
         
     def limpar_user_senha(self):
         self.primeira_tela.lineEdit.setText("")
@@ -164,11 +157,8 @@ class Interface:
         self.iniciar_primeira_tela()
         self.limpar_user_senha()
 
-    
-
 app=QtWidgets.QApplication([])
 iniciar_interface = Interface(f"Tela_Inicial.ui", "segunda_tela.ui", "tela_cadastro.ui", "tela_admin.ui")
 iniciar_interface.iniciar_primeira_tela()
-
 
 app.exec()
