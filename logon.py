@@ -61,7 +61,6 @@ class Interface:
 
     def coleta_banco(self):
         self.nome_usuario = self.primeira_tela.lineEdit.text()
-
         self.banco = sqlite3.connect('banco_cadastro.db')
         self.cursor = self.banco.cursor()
         self.cursor.execute("SELECT senha FROM cadastro WHERE login ='{}'".format(self.nome_usuario))
@@ -89,12 +88,11 @@ class Interface:
     def validar_usuario(self):
         if self.verificar_senha() == True:
             self.fecha_primeira_tela_abre_segunda_tela()
-            
+            self.nome_na_tela_user()
         else:
             return self.erro_usuario_incorreto()
 
     def logar(self):
-        
         try:
             self.coleta_banco()
         except sqlite3.Error as erro:
@@ -102,7 +100,7 @@ class Interface:
 
         if self.verificar_admin() == True and self.verificar_senha() == True:
             self.iniciar_tela_admin()
-            self.admin_tela()
+            self.nome_na_tela_admin()
             self.fechar_primeria_tela()
 
         else:        
@@ -147,8 +145,11 @@ class Interface:
         self.primeira_tela.lineEdit.setText("")
         self.primeira_tela.lineEdit_2.setText("")
             
-    def admin_tela(self):
-        self.tela_admin.label_2.setText(f"{self.nome_usuario}")
+    def nome_na_tela_admin(self):
+        self.tela_admin.nome_user.setText(f"{self.nome_usuario}")
+        
+    def nome_na_tela_user(self):
+        self.segunda_tela.nome_user.setText(f"{self.nome_usuario}")
 
     def logout(self):
         self.fechar_segunda_tela()
