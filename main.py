@@ -1,17 +1,21 @@
 import webbrowser
 from PyQt5 import uic, QtWidgets
 import sqlite3
+from bot import Binance_bot
+import os
 
 class Interface:
-    def __init__(self, primeira_tela, segunda_tela, tela_cadastro, tela_admin):
+    def __init__(self, primeira_tela, segunda_tela, tela_cadastro, tela_admin, tela_erro):
         self.primeira_tela= uic.loadUi(primeira_tela)
         self.primeira_tela.pushButton.clicked.connect(self.logar)
         self.primeira_tela.label_3.setText("")
         self.primeira_tela.lineEdit_2.setEchoMode(QtWidgets.QLineEdit.Password)
         self.primeira_tela.pushButton_2.clicked.connect(self.abrir_git)
+        self.primeira_tela.botao_api.clicked.connect(self.)
 
         self.segunda_tela = uic.loadUi(segunda_tela)
         self.segunda_tela.pushButton.clicked.connect(self.logout)
+        self.segunda_tela.botao_ver_saldo.clicked.connect(self.ver_saldo)
         
         self.tela_cadastro = uic.loadUi(tela_cadastro)
         self.tela_cadastro.erro.setText("")
@@ -21,10 +25,19 @@ class Interface:
         self.tela_admin = uic.loadUi(tela_admin)
         self.tela_admin.botao_deslogar.clicked.connect(self.logout)
         self.tela_admin.botao_cadastrar.clicked.connect(self.cadastro_tela)
+
+        self.tela_erro = uic.loadUi(tela_erro)
+        self.tela_erro.label.setText("")
+        self.bot = Binance_bot()
+
+        
             
     def iniciar_tela_admin(self):
         self.tela_admin.show()
-    
+
+    def iniciar_tela_erro(self):
+        self.tela_erro.show()
+
     def fechar_tela_admin(self):
         self.tela_admin.close()
 
@@ -53,11 +66,18 @@ class Interface:
     def abrir_git(self):
         webbrowser.open_new_tab('https://github.com/vbsx')
     
+    def mostrar_erro_janela_pop_up(self, erro):
+        self.tela_erro.label.setText(f"{erro}")
+
     def mostrar_erro_banco_primeira_tela(self):
         self.primeira_tela.label_3.setText("Exeção banco de dados")
 
     def erro_usuario_senha(self):
         self.primeira_tela.label_3.setText("Usuário ou senha inválidos!")
+
+    def excluir_env(self):
+        if self.bot.verificar_existencia_env() == True:
+            os.remove(".env")
 
     def coleta_banco(self):
         self.nome_usuario = self.primeira_tela.lineEdit.text()
@@ -142,8 +162,21 @@ class Interface:
         # self.tela_cadastro.senha.setEchoMode(QtWidgets.QLineEdit.Password)
         # self.tela_cadastro.confirmar_senha.setEchoMode(QtWidgets.QLineEdit.Password)
         
+    def verificar_env_configurado(self):
+        t = self.bot.verificar_conteudo_env()
         
-        
+        if t == True:
+            return True
+        else:
+            self.iniciar_tela_erro()
+            self.mostrar_erro_janela_pop_up("Favor configure seu o seu APY_KEY e SECRET_KEY na tela inicial antes de prosseguir!")
+
+    def ver_saldo(self):
+        self.verificar_env_configurado()
+
+    def adicionar_api_key(self):
+        if 
+
     def limpar_user_senha(self):
         self.primeira_tela.lineEdit.setText("")
         self.primeira_tela.lineEdit_2.setText("")
@@ -160,9 +193,11 @@ class Interface:
         self.fechar_tela_cadastro()
         self.iniciar_primeira_tela()
         self.limpar_user_senha()
+        self.excluir_env()
+        
 
 app=QtWidgets.QApplication([])
-iniciar_interface = Interface(f"Tela_Inicial.ui", "segunda_tela.ui", "tela_cadastro.ui", "tela_admin.ui")
+iniciar_interface = Interface(f"Interfaces/Tela_Inicial.ui", "Interfaces/segunda_tela.ui", "Interfaces/tela_cadastro.ui",
+ "Interfaces/tela_admin.ui", "Interfaces/tela_erro.ui")
 iniciar_interface.iniciar_primeira_tela()
-
 app.exec()
