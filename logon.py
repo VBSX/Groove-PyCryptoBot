@@ -21,7 +21,7 @@ class Interface:
         self.tela_admin = uic.loadUi(tela_admin)
         self.tela_admin.botao_deslogar.clicked.connect(self.logout)
         self.tela_admin.botao_cadastrar.clicked.connect(self.cadastro_tela)
-        
+            
     def iniciar_tela_admin(self):
         self.tela_admin.show()
     
