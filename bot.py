@@ -6,7 +6,7 @@ from binance.enums import *
 
 class Binance_bot():
     def __init__(self):
-        pass
+        
         # self.API_KEY = os.getenv("API_KEY")
         # self.SECRET_KEY = os.getenv("SECRET_KEY")
         # self.client = Client(self.API_KEY, self.SECRET_KEY)
@@ -15,28 +15,23 @@ class Binance_bot():
         self.env = '.env'
     
     def verificar_existencia_env(self):
-        
         if os.path.exists(self.env):
             return True
     
     def verificar_apy_key_existe(self):
-        c = self.reader[0]
-        d = self.reader[1]
-        
-        if "APY_KEY" in c and "SECRET_KEY" in d:
+        c = self.leitor[0]
+        d = self.leitor[1]
+        if "API_KEY" in c and "SECRET_KEY" in d:
             return True
-
-    def ler_arquivo_env(self):
-        self.reader.readlines()
-
+        
     def abrir_env(self):
-        with open(self.env) as self.reader:
-            self.ler_arquivo_env()
-            print(self.reader)
+        with open(self.env) as reader:
+            self.leitor = reader.readlines()
+            
     
             
     def verificar_conteudo_env(self):
-        if self.verificar_existencia_env() == True and self.verificar_apy_key_existe() == True:
+        if self.verificar_existencia_env() == True:
             self.API_KEY = os.getenv("API_KEY")
             self.SECRET_KEY = os.getenv("SECRET_KEY")
             self.client = Client(self.API_KEY, self.SECRET_KEY)
@@ -44,7 +39,6 @@ class Binance_bot():
             self.lista_saldos = self.informacoes["balances"]
             
             self.abrir_env()
-
         else:
             return False
 
@@ -54,7 +48,8 @@ class Binance_bot():
                 print(self.cripto)
 
 
-# bot = Binance_bot()
-# bot.verificar_existencia_env()
-# bot.verificar_conteudo_env()
+bot = Binance_bot()
+#bot.verificar_conteudo_env()
+
+
 #bot.moedas_com_saldo()

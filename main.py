@@ -11,11 +11,11 @@ class Interface:
         self.primeira_tela.label_3.setText("")
         self.primeira_tela.lineEdit_2.setEchoMode(QtWidgets.QLineEdit.Password)
         self.primeira_tela.pushButton_2.clicked.connect(self.abrir_git)
-        self.primeira_tela.botao_api.clicked.connect(self.)
 
         self.segunda_tela = uic.loadUi(segunda_tela)
         self.segunda_tela.pushButton.clicked.connect(self.logout)
         self.segunda_tela.botao_ver_saldo.clicked.connect(self.ver_saldo)
+        self.segunda_tela.botao_api.clicked.connect(self.adicionar_api_key)
         
         self.tela_cadastro = uic.loadUi(tela_cadastro)
         self.tela_cadastro.erro.setText("")
@@ -29,9 +29,7 @@ class Interface:
         self.tela_erro = uic.loadUi(tela_erro)
         self.tela_erro.label.setText("")
         self.bot = Binance_bot()
-
-        
-            
+         
     def iniciar_tela_admin(self):
         self.tela_admin.show()
 
@@ -159,12 +157,11 @@ class Interface:
         
     def cadastro_tela(self):
         self.iniciar_tela_cadastro()
-        # self.tela_cadastro.senha.setEchoMode(QtWidgets.QLineEdit.Password)
-        # self.tela_cadastro.confirmar_senha.setEchoMode(QtWidgets.QLineEdit.Password)
         
     def verificar_env_configurado(self):
-        t = self.bot.verificar_conteudo_env()
-        
+        self.bot.abrir_env()
+        t = self.bot.verificar_existencia_env()
+        v = self.bot.verificar_apy_key_existe()
         if t == True:
             return True
         else:
@@ -175,8 +172,12 @@ class Interface:
         self.verificar_env_configurado()
 
     def adicionar_api_key(self):
-        if 
-
+        if self.bot.verificar_existencia_env() == True:
+            self.iniciar_tela_erro()
+            self.mostrar_erro_janela_pop_up("APY_KEY Já configurado, deslogue e logue novamente para adicionar um novo APY_KEY")
+        else:
+            
+        
     def limpar_user_senha(self):
         self.primeira_tela.lineEdit.setText("")
         self.primeira_tela.lineEdit_2.setText("")
@@ -195,7 +196,6 @@ class Interface:
         self.limpar_user_senha()
         self.excluir_env()
         
-
 app=QtWidgets.QApplication([])
 iniciar_interface = Interface(f"Interfaces/Tela_Inicial.ui", "Interfaces/segunda_tela.ui", "Interfaces/tela_cadastro.ui",
  "Interfaces/tela_admin.ui", "Interfaces/tela_erro.ui")
