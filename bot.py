@@ -7,11 +7,11 @@ from binance.enums import *
 class Binance_bot():
     def __init__(self):
         
-        # self.API_KEY = os.getenv("API_KEY")
-        # self.SECRET_KEY = os.getenv("SECRET_KEY")
-        # self.client = Client(self.API_KEY, self.SECRET_KEY)
-        # self.informacoes = self.client.get_account()
-        # self.lista_saldos = self.informacoes["balances"]
+        self.API_KEY = os.getenv("API_KEY")
+        self.SECRET_KEY = os.getenv("SECRET_KEY")
+        self.client = Client(self.API_KEY, self.SECRET_KEY)
+        self.informacoes = self.client.get_account()
+        self.lista_saldos = self.informacoes["balances"]
         self.env = '.env'
     
     def verificar_existencia_env(self):
@@ -32,24 +32,17 @@ class Binance_bot():
             
     def verificar_conteudo_env(self):
         if self.verificar_existencia_env() == True:
-            self.API_KEY = os.getenv("API_KEY")
-            self.SECRET_KEY = os.getenv("SECRET_KEY")
-            self.client = Client(self.API_KEY, self.SECRET_KEY)
-            self.informacoes = self.client.get_account()
-            self.lista_saldos = self.informacoes["balances"]
-            
             self.abrir_env()
         else:
             return False
-
+    
     def moedas_com_saldo(self):
-        for self.cripto in self.lista_saldos:
-            if float(self.cripto['free']) > 0:
-                print(self.cripto)
-
+        for cripto in self.lista_saldos:
+            if float(cripto['free']) > 0:
+                return cripto
 
 bot = Binance_bot()
 #bot.verificar_conteudo_env()
-
+#bot.moedas_com_saldo()
 
 #bot.moedas_com_saldo()

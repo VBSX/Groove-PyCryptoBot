@@ -3,20 +3,24 @@ from PyQt5 import uic, QtWidgets
 import sqlite3
 from bot import Binance_bot
 import os
+import cryptocode
 
 class Interface:
-    def __init__(self, primeira_tela, segunda_tela, tela_cadastro, tela_admin, tela_erro):
+    def __init__(self, primeira_tela, segunda_tela, tela_cadastro, tela_admin, tela_erro, tela_key):
+        
         self.primeira_tela= uic.loadUi(primeira_tela)
         self.primeira_tela.pushButton.clicked.connect(self.logar)
         self.primeira_tela.label_3.setText("")
         self.primeira_tela.lineEdit_2.setEchoMode(QtWidgets.QLineEdit.Password)
         self.primeira_tela.pushButton_2.clicked.connect(self.abrir_git)
+        
 
         self.segunda_tela = uic.loadUi(segunda_tela)
         self.segunda_tela.pushButton.clicked.connect(self.logout)
         self.segunda_tela.botao_ver_saldo.clicked.connect(self.ver_saldo)
         self.segunda_tela.botao_api.clicked.connect(self.adicionar_api_key)
         
+
         self.tela_cadastro = uic.loadUi(tela_cadastro)
         self.tela_cadastro.erro.setText("")
         self.tela_cadastro.cadastrado.setText("")
@@ -29,7 +33,17 @@ class Interface:
         self.tela_erro = uic.loadUi(tela_erro)
         self.tela_erro.label.setText("")
         self.bot = Binance_bot()
+
+        self.tela_key = uic.loadUi(tela_key)
+        self.tela_key.botao_config.clicked.connect(self.criar_env)
+
+        self.lista_janelas = [self.segunda_tela, self.tela_cadastro, self.tela_admin, self.tela_erro, self.tela_key]
+
+        self.saldo_total = self.bot.moedas_com_saldo()
          
+    def iniciar_tela_key(self):
+        self.tela_key.show()
+
     def iniciar_tela_admin(self):
         self.tela_admin.show()
 
@@ -45,6 +59,9 @@ class Interface:
     def iniciar_segunda_tela(self):
         self.segunda_tela.show()
 
+    def fechar_janela_erro(self):
+        self.primeira_tela.close()
+
     def fechar_primeria_tela(self):
         self.primeira_tela.close()
 
@@ -57,6 +74,8 @@ class Interface:
     def fechar_tela_cadastro(self):
         self.tela_cadastro.close()
 
+    def fechar_tela_key(self):
+        self.tela_key.close()
     def fecha_primeira_tela_abre_segunda_tela(self):
         self.fechar_primeria_tela()
         self.iniciar_segunda_tela()
@@ -76,6 +95,19 @@ class Interface:
     def excluir_env(self):
         if self.bot.verificar_existencia_env() == True:
             os.remove(".env")
+
+    def criar_env(self):
+        self.api = self.tela_key.apy_key.text()
+        self.secret = self.tela_key.secret_key.text()
+        texto_api = (f'API_KEY = "{self.api}"\n')
+        texto_secret = (f'SECRET_KEY = "{self.secret}"')
+        texto_final = (texto_api+texto_secret)
+        env = '.env'
+        with open(env, 'w+') as writer:
+            self.escritor = writer.writelines(texto_final)
+        self.fechar_tela_key()
+        self.iniciar_tela_erro()
+        self.mostrar_erro_janela_pop_up("Api e secret key configurados com sucesso!")
 
     def coleta_banco(self):
         self.nome_usuario = self.primeira_tela.lineEdit.text()
@@ -167,16 +199,35 @@ class Interface:
         else:
             self.iniciar_tela_erro()
             self.mostrar_erro_janela_pop_up("Favor configure seu o seu APY_KEY e SECRET_KEY na tela inicial antes de prosseguir!")
+    
+    def nome_coin_saldos(self):
+        for moeda in self.saldo_total['asset']:
+            return moeda
+    def din_din_no_saldo(self):
+        for saldo in self.saldo_total['free']:
+            print(float(saldo))
+            return saldo
+    def gerar_info_saldo(self):
+
+        texto_saldo = (self.nome_coin_saldos()+self.din_din_no_saldo())
+        self.segunda_tela.label_resultado.setText(f"{texto_saldo}")
 
     def ver_saldo(self):
-        self.verificar_env_configurado()
+        if self.verificar_env_configurado() == True:
+            self.segunda_tela.label_resultado.setText("")
+            self.gerar_info_saldo()
+
+            
+            
+            
+
 
     def adicionar_api_key(self):
         if self.bot.verificar_existencia_env() == True:
             self.iniciar_tela_erro()
             self.mostrar_erro_janela_pop_up("APY_KEY Já configurado, deslogue e logue novamente para adicionar um novo APY_KEY")
         else:
-            
+            self.iniciar_tela_key()
         
     def limpar_user_senha(self):
         self.primeira_tela.lineEdit.setText("")
@@ -187,17 +238,18 @@ class Interface:
         
     def nome_na_tela_user(self):
         self.segunda_tela.nome_user.setText(f"{self.nome_usuario}")
+    def fechar_todas_as_janelas(self):
+        for janela in self.lista_janelas:
+            janela.close()
 
     def logout(self):
-        self.fechar_segunda_tela()
-        self.fechar_tela_admin()
-        self.fechar_tela_cadastro()
+        self.fechar_todas_as_janelas()
         self.iniciar_primeira_tela()
         self.limpar_user_senha()
         self.excluir_env()
         
 app=QtWidgets.QApplication([])
 iniciar_interface = Interface(f"Interfaces/Tela_Inicial.ui", "Interfaces/segunda_tela.ui", "Interfaces/tela_cadastro.ui",
- "Interfaces/tela_admin.ui", "Interfaces/tela_erro.ui")
+ "Interfaces/tela_admin.ui", "Interfaces/tela_erro.ui", "Interfaces/tela_key.ui")
 iniciar_interface.iniciar_primeira_tela()
 app.exec()
