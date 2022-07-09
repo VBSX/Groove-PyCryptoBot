@@ -190,15 +190,14 @@ class Interface:
     def cadastro_tela(self):
         self.iniciar_tela_cadastro()
         
-    def verificar_env_configurado(self):
-        self.bot.abrir_env()
-        t = self.bot.verificar_existencia_env()
-        v = self.bot.verificar_apy_key_existe()
-        if t == True:
-            return True
-        else:
-            self.iniciar_tela_erro()
-            self.mostrar_erro_janela_pop_up("Favor configure seu o seu APY_KEY e SECRET_KEY na tela inicial antes de prosseguir!")
+    # def verificar_env_configurado(self):
+    #     try:
+    #         if self.bot.verificar_existencia_env() == True:
+                
+    #             return True
+    #     except:
+    #         self.iniciar_tela_erro()
+    #         self.mostrar_erro_janela_pop_up("Favor configure seu o seu APY_KEY e SECRET_KEY na tela inicial antes de prosseguir!")
     
     def nome_coin_saldos(self):
         for moeda in self.saldo_total['asset']:
@@ -213,14 +212,14 @@ class Interface:
         self.segunda_tela.label_resultado.setText(f"{texto_saldo}")
 
     def ver_saldo(self):
-        if self.verificar_env_configurado() == True:
-            self.segunda_tela.label_resultado.setText("")
-            self.gerar_info_saldo()
-
-            
-            
-            
-
+        try:
+            if  self.bot.verificar_existencia_env() == True:
+                self.bot.abrir_env()
+                self.segunda_tela.label_resultado.setText("")
+                self.gerar_info_saldo()
+        except:
+            self.iniciar_tela_erro()
+            self.mostrar_erro_janela_pop_up("Favor configure seu o seu APY_KEY e SECRET_KEY na tela inicial antes de prosseguir!")
 
     def adicionar_api_key(self):
         if self.bot.verificar_existencia_env() == True:

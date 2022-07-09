@@ -48,7 +48,7 @@
           <string/>
          </property>
          <property name="pixmap">
-          <pixmap>imagens/usuario.png</pixmap>
+          <pixmap>../imagens/usuario.png</pixmap>
          </property>
         </widget>
        </item>
@@ -99,7 +99,7 @@ border-width: 2px;</string>
           <string/>
          </property>
          <property name="pixmap">
-          <pixmap>imagens/senha.png</pixmap>
+          <pixmap>../imagens/senha.png</pixmap>
          </property>
          <property name="scaledContents">
           <bool>false</bool>
@@ -258,9 +258,15 @@ border-style: outset;
        </item>
        <item>
         <widget class="QLabel" name="label_4">
+         <property name="minimumSize">
+          <size>
+           <width>50</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="maximumSize">
           <size>
-           <width>48</width>
+           <width>50</width>
            <height>48</height>
           </size>
          </property>
@@ -268,7 +274,7 @@ border-style: outset;
           <string/>
          </property>
          <property name="pixmap">
-          <pixmap>imagens/github.png</pixmap>
+          <pixmap>../imagens/github.png</pixmap>
          </property>
         </widget>
        </item>
