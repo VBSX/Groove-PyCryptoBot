@@ -10,7 +10,6 @@ class Binance_bot():
     
     def verificar_existencia_env(self):
         if os.path.exists(self.env):
-            print("chegay")
             return True
       
     def verificar_apy_key_existe(self):
@@ -35,14 +34,17 @@ class Binance_bot():
             return False
     
     def moedas_com_saldo(self):
-        if self.verificar_existencia_env == True:
-
+        if self.verificar_existencia_env() == True:
+            self.abrir_env()
             for cripto in self.lista_saldos:
-                if float(cripto['free']) > 0:
-                    return cripto
+                if float(cripto["free"]) > 0:
+                    print (cripto)
+        else:
+            print("erro sem env")
 
 bot = Binance_bot()
 #bot.verificar_conteudo_env()
-#bot.moedas_com_saldo()
+bot.moedas_com_saldo()
+
 
 #bot.moedas_com_saldo()

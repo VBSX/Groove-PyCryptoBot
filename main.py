@@ -204,7 +204,8 @@ class Interface:
             return moeda
     def din_din_no_saldo(self):
         for saldo in self.saldo_total['free']:
-            print(float(saldo))
+            
+            print(round(float(saldo),5))
             return saldo
     def gerar_info_saldo(self):
 
@@ -212,12 +213,11 @@ class Interface:
         self.segunda_tela.label_resultado.setText(f"{texto_saldo}")
 
     def ver_saldo(self):
-        try:
-            if  self.bot.verificar_existencia_env() == True:
-                self.bot.abrir_env()
-                self.segunda_tela.label_resultado.setText("")
-                self.gerar_info_saldo()
-        except:
+        if  self.bot.verificar_existencia_env() == True:
+            self.bot.abrir_env()
+            self.segunda_tela.label_resultado.setText("")
+            self.gerar_info_saldo()
+        else:
             self.iniciar_tela_erro()
             self.mostrar_erro_janela_pop_up("Favor configure seu o seu APY_KEY e SECRET_KEY na tela inicial antes de prosseguir!")
 
