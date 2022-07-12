@@ -2,6 +2,7 @@ from dotenv import load_dotenv
 import os
 from binance.client import Client
 from binance.enums import *
+import pandas as pd
 #from logon import Interface
 
 class Binance_bot():
@@ -33,12 +34,21 @@ class Binance_bot():
         else:
             return False
     
+    def dados_xlsx(self):
+        # with pd.ExcelWriter("saldo.xlsx") as writer:
+        s = self.cripto['asset']
+        d = self.cripto['free']
+        dados = {'nome moeda': [f'{s}','asdasjd'], 'saldo moeda': [f'{d}','asdjasd']}
+        self.data_frame = pd.DataFrame(dados)
+        print(dados)
+        self.data_frame.to_excel('saldo.xlsx', index = False)
+            
     def moedas_com_saldo(self):
         if self.verificar_existencia_env() == True:
             self.abrir_env()
-            for cripto in self.lista_saldos:
-                if float(cripto["free"]) > 0:
-                    print (cripto)
+            for self.cripto in self.lista_saldos:
+                if float(self.cripto["free"]) > 0:
+                    self.dados_xlsx()
         else:
             print("erro sem env")
 

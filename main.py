@@ -4,9 +4,10 @@ import sqlite3
 from bot import Binance_bot
 import os
 import cryptocode
+import pandas as pd
 
 class Interface:
-    def __init__(self, primeira_tela, segunda_tela, tela_cadastro, tela_admin, tela_erro, tela_key):
+    def __init__(self, primeira_tela, segunda_tela, tela_cadastro, tela_admin, tela_erro, tela_key, tela_saldo):
         
         self.primeira_tela= uic.loadUi(primeira_tela)
         self.primeira_tela.pushButton.clicked.connect(self.logar)
@@ -37,9 +38,10 @@ class Interface:
         self.tela_key = uic.loadUi(tela_key)
         self.tela_key.botao_config.clicked.connect(self.criar_env)
 
-        self.lista_janelas = [self.segunda_tela, self.tela_cadastro, self.tela_admin, self.tela_erro, self.tela_key]
-
         self.saldo_total = self.bot.moedas_com_saldo()
+
+        self.tela_saldo = uic.loadUi(tela_saldo)
+        self.lista_janelas = [self.segunda_tela, self.tela_cadastro, self.tela_admin, self.tela_erro, self.tela_key, self.tela_saldo]
          
     def iniciar_tela_key(self):
         self.tela_key.show()
@@ -249,6 +251,6 @@ class Interface:
         
 app=QtWidgets.QApplication([])
 iniciar_interface = Interface(f"Interfaces/Tela_Inicial.ui", "Interfaces/segunda_tela.ui", "Interfaces/tela_cadastro.ui",
- "Interfaces/tela_admin.ui", "Interfaces/tela_erro.ui", "Interfaces/tela_key.ui")
+ "Interfaces/tela_admin.ui", "Interfaces/tela_erro.ui", "Interfaces/tela_key.ui", "Interfaces/tela_saldo.ui")
 iniciar_interface.iniciar_primeira_tela()
 app.exec()
