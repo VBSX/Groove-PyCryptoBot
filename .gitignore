@@ -1,3 +1,5 @@
 .env
 __pycache__
+bot.cpython-310.pyc
+logon.cpython-310.pyc
 banco_cadastro.db-journal
