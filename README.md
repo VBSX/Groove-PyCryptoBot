@@ -1,12 +1,13 @@
 # Groove-PyCryptoBot
-Para logar como admiministrador use:
+
+Para logar como administrador use:
 User: admin
 senha: 123456
 
 Para logar com o usuário padrão use:
 User: user
-senha: 123456
+Senha: passwd
 
-OBS: BOT ainda em desenvolvimento! 
+### OBS: BOT ainda em desenvolvimento!
 
-WORK IN PROGRESS
+### WORK IN PROGRESS

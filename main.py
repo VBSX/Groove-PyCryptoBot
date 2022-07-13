@@ -130,9 +130,9 @@ class Interface:
 
     def verificar_senha(self):
         self.senha = self.primeira_tela.lineEdit_2.text()
+        self.senha_db_decriptada = cryptocode.decrypt(f'{self.senha_db[0][0]}','senha@123')
         try:
-            if self.senha == self.senha_db[0][0]:
-                #self.fecha_primeira_tela_abre_segunda_tela()
+            if self.senha == self.senha_db_decriptada:
                 return True
         except:
             return self.erro_usuario_incorreto()
@@ -161,11 +161,13 @@ class Interface:
     def cadastrar_user_banco(self):
         self.nome_cadastro = self.tela_cadastro.nome.text()
         self.login_cadastro = self.tela_cadastro.login.text()
+        self.senha_criptografada_do_cadastro = cryptocode.encrypt(f'{self.senha_cadastro}', 'senha@123')
+        self.senha_criptograda_confimacao_do_cadastro = cryptocode.encrypt(f'{self.confimacao_senha_cadastro}', 'senha@123')
         try:
             
             self.banco = sqlite3.connect('banco_cadastro.db') 
             self.cursor = self.banco.cursor()
-            self.cursor.execute("INSERT INTO cadastro VALUES ('"+self.nome_cadastro+"','"+self.login_cadastro+"','"+self.senha_cadastro+"')")
+            self.cursor.execute("INSERT INTO cadastro VALUES ('"+self.nome_cadastro+"','"+self.login_cadastro+"','"+self.senha_criptografada_do_cadastro+"')")
             self.banco.commit() 
             self.banco.close()
             self.tela_cadastro.cadastrado.setText("Usuario cadastrado com sucesso")
@@ -176,6 +178,8 @@ class Interface:
     def verificar_senha_cadastro(self):
         self.senha_cadastro = self.tela_cadastro.senha.text()
         self.confimacao_senha_cadastro = self.tela_cadastro.confirmar_senha.text()
+
+        
         if self.senha_cadastro == self.confimacao_senha_cadastro:
             return True
         else:
@@ -183,23 +187,13 @@ class Interface:
 
     def cadastrar(self):
         self.verificar_senha_cadastro()
-        print('ja verificou a senha')
 
         if self.verificar_senha_cadastro() == True:
-            print('abrindo o cadastro')
             self.cadastrar_user_banco()
         
     def cadastro_tela(self):
         self.iniciar_tela_cadastro()
         
-    # def verificar_env_configurado(self):
-    #     try:
-    #         if self.bot.verificar_existencia_env() == True:
-                
-    #             return True
-    #     except:
-    #         self.iniciar_tela_erro()
-    #         self.mostrar_erro_janela_pop_up("Favor configure seu o seu APY_KEY e SECRET_KEY na tela inicial antes de prosseguir!")
     
     def nome_coin_saldos(self):
         for moeda in self.saldo_total['asset']:
