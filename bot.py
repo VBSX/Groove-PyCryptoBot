@@ -33,15 +33,21 @@ class Binance_bot():
             self.abrir_env()
         else:
             return False
-    
+        
+    def enviar_para_planilha(self):
+        self.data_frame.to_excel('saldo.xlsx', index = True )
+        
+    def adicionar_dados_para_linhas_excel(self):
+        self.data_frame.loc[len(self.data_frame)] = [f'{self.nome_moeda}',f'{self.valor_da_moeda}']
+        
     def dados_xlsx(self):
-        # with pd.ExcelWriter("saldo.xlsx") as writer:
-        s = self.cripto['asset']
-        d = self.cripto['free']
-        dados = {'nome moeda': [f'{s}','asdasjd'], 'saldo moeda': [f'{d}','asdjasd']}
-        self.data_frame = pd.DataFrame(dados)
-        print(dados)
-        self.data_frame.to_excel('saldo.xlsx', index = False)
+        
+        self.nome_moeda = self.cripto['asset']
+        self.valor_da_moeda = self.cripto['free']
+        self.dados = {'nome moeda': [f'{self.nome_moeda}','asdasjd'], 'saldo moeda': [f'{self.valor_da_moeda}','asdjasd']}
+        self.data_frame = pd.DataFrame(self.dados)
+        print(self.dados)
+        
             
     def moedas_com_saldo(self):
         if self.verificar_existencia_env() == True:
@@ -49,6 +55,9 @@ class Binance_bot():
             for self.cripto in self.lista_saldos:
                 if float(self.cripto["free"]) > 0:
                     self.dados_xlsx()
+                    self.adicionar_dados_para_linhas_excel()
+        
+                    self.enviar_para_planilha()
         else:
             print("erro sem env")
 
