@@ -35,7 +35,7 @@
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="layoutWidget">
        <layout class="QGridLayout" name="gridnome">
         <item row="0" column="0">
          <widget class="QLabel" name="moeda1">
@@ -179,7 +179,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="layoutWidget">
        <layout class="QGridLayout" name="gridvalor">
         <item row="0" column="0">
          <widget class="QLabel" name="saldo1">

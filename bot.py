@@ -1,3 +1,4 @@
+from operator import ne
 from dotenv import load_dotenv
 import os
 from binance.client import Client
@@ -32,38 +33,63 @@ class Binance_bot():
         if self.verificar_existencia_env() == True:
             self.abrir_env()
         else:
+            
+            
             return False
         
-    def enviar_para_planilha(self):
-        self.data_frame.to_excel('saldo.xlsx', index = True )
         
-    def adicionar_dados_para_linhas_excel(self):
-        self.data_frame.loc[len(self.data_frame)] = [f'{self.nome_moeda}',f'{self.valor_da_moeda}']
+    def enviar_para_planilha(self, dados):
+        dados.to_excel('saldo.xlsx', index = True)
+        
+        
+    def adicionar_dados_para_linhas_excel(self, data_frame):
+        df = pd.read_excel('saldo.xlsx', index_col=0)
+        new_row = pd.DataFrame(data_frame)
+      
+        p = pd.concat([new_row, df]).reset_index(drop = True)
+        
+        return p
+        
+    
+    def adicionar_legenda_xlsx(self):
+        columns = {'nome moeda':[], 'saldo moeda':[]}
+        data = pd.DataFrame(columns)
+        data.to_excel('saldo.xlsx', index=True)
+        
+        
+        
+    def deletar_xlsx(self):
+        if os.path.exists('saldo.xlsx'):
+            os.remove('saldo.xlsx')
+        
         
     def dados_xlsx(self):
         
-        self.nome_moeda = self.cripto['asset']
-        self.valor_da_moeda = self.cripto['free']
-        self.dados = {'nome moeda': [f'{self.nome_moeda}','asdasjd'], 'saldo moeda': [f'{self.valor_da_moeda}','asdjasd']}
-        self.data_frame = pd.DataFrame(self.dados)
-        print(self.dados)
+        nome_moeda = self.cripto['asset']
+        valor_da_moeda = str(self.cripto['free']).zfill(10)
+        dados = {'nome moeda': [f'{nome_moeda}'], 'saldo moeda': [f'{valor_da_moeda}']}
+        
+        return dados
         
             
     def moedas_com_saldo(self):
         if self.verificar_existencia_env() == True:
             self.abrir_env()
+            self.deletar_xlsx()
+            self.adicionar_legenda_xlsx()
             for self.cripto in self.lista_saldos:
                 if float(self.cripto["free"]) > 0:
-                    self.dados_xlsx()
-                    self.adicionar_dados_para_linhas_excel()
+                    
+                    
+                    dados = self.adicionar_dados_para_linhas_excel(self.dados_xlsx())
         
-                    self.enviar_para_planilha()
+                    self.enviar_para_planilha(dados)
         else:
             print("erro sem env")
 
 bot = Binance_bot()
 #bot.verificar_conteudo_env()
-bot.moedas_com_saldo()
+# bot.moedas_com_saldo()
 
 
 #bot.moedas_com_saldo()

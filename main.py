@@ -38,8 +38,7 @@ class Interface:
         self.tela_key = uic.loadUi(tela_key)
         self.tela_key.botao_config.clicked.connect(self.criar_env)
 
-        self.saldo_total = self.bot.moedas_com_saldo()
-
+        
         self.tela_saldo = uic.loadUi(tela_saldo)
         self.lista_janelas = [self.segunda_tela, self.tela_cadastro, self.tela_admin, self.tela_erro, self.tela_key, self.tela_saldo]
          
@@ -190,23 +189,36 @@ class Interface:
 
         if self.verificar_senha_cadastro() == True:
             self.cadastrar_user_banco()
-        
+    
     def cadastro_tela(self):
         self.iniciar_tela_cadastro()
+    
+    def coletar_excel(self):
+        self.bot.moedas_com_saldo()
         
+    def ler_excel(self):
+        self.coletar_excel()
+        leitor = pd.read_excel('saldo.xlsx', index_col=0)
+        print(leitor)
+        return leitor
     
     def nome_coin_saldos(self):
-        for moeda in self.saldo_total['asset']:
+        lista_coin = self.ler_excel()['saldo moeda']
+        print(lista_coin)
+        
+        for moeda in lista_coin:
             return moeda
     def din_din_no_saldo(self):
-        for saldo in self.saldo_total['free']:
+        for saldo in self.coletar_excel['nome moeda']:
             
-            print(round(float(saldo),5))
+           
             return saldo
     def gerar_info_saldo(self):
 
-        texto_saldo = (self.nome_coin_saldos()+self.din_din_no_saldo())
-        self.segunda_tela.label_resultado.setText(f"{texto_saldo}")
+        for nome_da_moeda in range(0, 20):
+            label_moeda = f'moeda{nome_da_moeda}'
+            self.tela_saldo.{label_moeda}.setText(self.nome_coin_saldos())
+
 
     def ver_saldo(self):
         if  self.bot.verificar_existencia_env() == True:
@@ -245,6 +257,7 @@ class Interface:
         
 app=QtWidgets.QApplication([])
 iniciar_interface = Interface(f"Interfaces/Tela_Inicial.ui", "Interfaces/segunda_tela.ui", "Interfaces/tela_cadastro.ui",
- "Interfaces/tela_admin.ui", "Interfaces/tela_erro.ui", "Interfaces/tela_key.ui", "Interfaces/tela_saldo.ui")
-iniciar_interface.iniciar_primeira_tela()
-app.exec()
+  "Interfaces/tela_admin.ui", "Interfaces/tela_erro.ui", "Interfaces/tela_key.ui", "Interfaces/tela_saldo.ui")
+# iniciar_interface.iniciar_primeira_tela()
+# app.exec()
+iniciar_interface.gerar_info_saldo()
