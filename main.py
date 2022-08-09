@@ -1,5 +1,6 @@
 import webbrowser
 from PyQt5 import uic, QtWidgets
+from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem
 import sqlite3
 from bot import Binance_bot
 import os
@@ -41,7 +42,9 @@ class Interface:
         
         self.tela_saldo = uic.loadUi(tela_saldo)
         self.lista_janelas = [self.segunda_tela, self.tela_cadastro, self.tela_admin, self.tela_erro, self.tela_key, self.tela_saldo]
-         
+    
+    def iniciar_tela_saldo(self):
+        self.tela_saldo.show()    
     def iniciar_tela_key(self):
         self.tela_key.show()
 
@@ -199,30 +202,33 @@ class Interface:
     def ler_excel(self):
         self.coletar_excel()
         leitor = pd.read_excel('saldo.xlsx', index_col=0)
-        print(leitor)
         return leitor
-    
-    def nome_coin_saldos(self):
-        lista_coin = self.ler_excel()['saldo moeda']
-        print(lista_coin)
+    def get_number_of_lines_df(self, df):
         
-        for moeda in lista_coin:
-            return moeda
-    def din_din_no_saldo(self):
-        for saldo in self.coletar_excel['nome moeda']:
-            
-           
-            return saldo
+        linhas = df.shape[0]
+        return linhas
+        
     def gerar_info_saldo(self):
+        
+        self.ler_excel()
+        df = self.ler_excel()
+        numero_linhas_df = self.get_number_of_lines_df(df)
+        self.tela_saldo.tableWidget.setRowCount(numero_linhas_df)
+        self.tela_saldo.tableWidget.setColumnCount(df.shape[1])
+        self.tela_saldo.tableWidget.setHorizontalHeaderLabels(df.columns)
 
-        for nome_da_moeda in range(0, 20):
-            label_moeda = f'moeda{nome_da_moeda}'
-            self.tela_saldo.{label_moeda}.setText(self.nome_coin_saldos())
-
-
+        for row in df.iterrows():
+            values = row[1]
+            for col_index, value in enumerate(values):
+                if isinstance(value, (float, int)):
+                    value = '{0:0,.9f}'.format(value)
+                table_item = QTableWidgetItem(str(value))
+                self.tela_saldo.tableWidget.setItem(row[0], col_index, table_item)
+                    
     def ver_saldo(self):
         if  self.bot.verificar_existencia_env() == True:
-            self.bot.abrir_env()
+            self.iniciar_tela_saldo()
+            self.coletar_excel()
             self.segunda_tela.label_resultado.setText("")
             self.gerar_info_saldo()
         else:
@@ -258,6 +264,6 @@ class Interface:
 app=QtWidgets.QApplication([])
 iniciar_interface = Interface(f"Interfaces/Tela_Inicial.ui", "Interfaces/segunda_tela.ui", "Interfaces/tela_cadastro.ui",
   "Interfaces/tela_admin.ui", "Interfaces/tela_erro.ui", "Interfaces/tela_key.ui", "Interfaces/tela_saldo.ui")
-# iniciar_interface.iniciar_primeira_tela()
-# app.exec()
-iniciar_interface.gerar_info_saldo()
+iniciar_interface.iniciar_primeira_tela()
+app.exec()
+# iniciar_interface.gerar_info_saldo()

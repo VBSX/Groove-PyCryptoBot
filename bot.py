@@ -87,7 +87,7 @@ class Binance_bot():
         else:
             print("erro sem env")
 
-bot = Binance_bot()
+#bot = Binance_bot()
 #bot.verificar_conteudo_env()
 # bot.moedas_com_saldo()
 

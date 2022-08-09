@@ -6,3 +6,4 @@ banco_cadastro.db-journal
 *.xlsx
 *.pyc
 saldo.xlsx
+*.xlsx
