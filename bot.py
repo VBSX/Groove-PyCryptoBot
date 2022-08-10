@@ -9,34 +9,85 @@ import pandas as pd
 class Binance_bot():
     def __init__(self):
         self.env = '.env'
-    
+             
+    def moedas_com_saldo(self):
+        if self.verificar_existencia_env() == True:
+            self.abrir_env()
+            self.deletar_xlsx()
+            self.adicionar_legenda_xlsx()
+            informations = self.get_binance_data()
+            lista_saldos = informations["balances"]
+            
+            
+            for self.cripto in lista_saldos:
+                
+                
+                if float(self.cripto["free"]) > 0:
+                    
+                    
+                    dados = self.adicionar_dados_para_linhas_excel(self.dados_xlsx())
+        
+                    self.enviar_para_planilha(dados)
+                    
+                    
+                    
+        else:
+            print("erro sem env")
+            
     def verificar_existencia_env(self):
         if os.path.exists(self.env):
+            
             return True
       
-    def verificar_apy_key_existe(self):
-        c = self.leitor[0]
-        d = self.leitor[1]
+    def verify_api_key(self):
+        c = self.abrir_env()[0]
+        d = self.abrir_env()[1]
         if "API_KEY" in c and "SECRET_KEY" in d:
+            
+            
             return True
         
+        
+    def get_api_key(self):
+        api_key = os.getenv("API_KEY")
+        
+        
+        return api_key
+    
+    
+    def get_secret_key(self):
+        secret_key = os.getenv("SECRET_KEY")
+        
+        
+        return secret_key
+    
+    
+    def get_binance_data(self):
+        api_key = self.get_api_key()
+        secret_key = self.get_secret_key()
+        
+        client = Client(api_key, secret_key)
+        informacoes = client.get_account()
+        
+        
+        return informacoes
+        
     def abrir_env(self):
-        self.API_KEY = os.getenv("API_KEY")
-        self.SECRET_KEY = os.getenv("SECRET_KEY")
-        self.client = Client(self.API_KEY, self.SECRET_KEY)
-        self.informacoes = self.client.get_account()
-        self.lista_saldos = self.informacoes["balances"]
         with open(self.env) as reader:
             self.leitor = reader.readlines()
-         
+            
+            
+        return self.leitor
+    
     def verificar_conteudo_env(self):
         if self.verificar_existencia_env() == True:
             self.abrir_env()
+            
+            
         else:
-            
-            
+  
+  
             return False
-        
         
     def enviar_para_planilha(self, dados):
         dados.to_excel('saldo.xlsx', index = True)
@@ -47,6 +98,7 @@ class Binance_bot():
         new_row = pd.DataFrame(data_frame)
       
         p = pd.concat([new_row, df]).reset_index(drop = True)
+        
         
         return p
         
@@ -69,27 +121,34 @@ class Binance_bot():
         valor_da_moeda = str(self.cripto['free']).zfill(10)
         dados = {'nome moeda': [f'{nome_moeda}'], 'saldo moeda': [f'{valor_da_moeda}']}
         
+        
         return dados
-        
-            
-    def moedas_com_saldo(self):
-        if self.verificar_existencia_env() == True:
-            self.abrir_env()
-            self.deletar_xlsx()
-            self.adicionar_legenda_xlsx()
-            for self.cripto in self.lista_saldos:
-                if float(self.cripto["free"]) > 0:
-                    
-                    
-                    dados = self.adicionar_dados_para_linhas_excel(self.dados_xlsx())
-        
-                    self.enviar_para_planilha(dados)
-        else:
-            print("erro sem env")
 
-#bot = Binance_bot()
-#bot.verificar_conteudo_env()
-# bot.moedas_com_saldo()
+    def test_env(self):
+        if self.verify_api_key() == True:
+            api_key = self.get_api_key()
+            secret_key = self.get_secret_key()
+            
+            try:
+                client = Client(api_key, secret_key)
+                client.get_account()
+                return True
+                
+            except:
+                
+                
+                return False
+            
+            
+        else:
+            return False
+
+bot = Binance_bot()
+bot.verificar_conteudo_env()
+bot.moedas_com_saldo()
+
+# c = bot.test_env()
+# print(c)
 
 
 #bot.moedas_com_saldo()
