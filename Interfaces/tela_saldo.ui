@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>399</width>
+    <width>438</width>
     <height>821</height>
    </rect>
   </property>
@@ -17,6 +17,9 @@
    <string notr="true"/>
   </property>
   <widget class="QWidget" name="centralwidget">
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(192, 192, 192);</string>
+   </property>
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
      <widget class="QLabel" name="label">
@@ -29,10 +32,20 @@
       <property name="font">
        <font>
         <pointsize>18</pointsize>
+        <underline>false</underline>
        </font>
+      </property>
+      <property name="mouseTracking">
+       <bool>false</bool>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(128, 128, 128);</string>
       </property>
       <property name="text">
        <string>Saldos Ativos em sua conta Binance</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
       </property>
      </widget>
     </item>
@@ -43,15 +56,12 @@
       </property>
       <widget class="QWidget" name="layoutWidget">
        <layout class="QGridLayout" name="gridvalor">
-        <item row="0" column="1">
-         <widget class="QLabel" name="saldo10">
-          <property name="text">
-           <string/>
+        <item row="0" column="0">
+         <widget class="QTableWidget" name="tableWidget">
+          <property name="styleSheet">
+           <string notr="true">background-color:rgb(248, 248, 255);</string>
           </property>
          </widget>
-        </item>
-        <item row="0" column="0">
-         <widget class="QTableWidget" name="tableWidget"/>
         </item>
        </layout>
       </widget>

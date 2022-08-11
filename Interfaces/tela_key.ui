@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>539</width>
+    <width>782</width>
     <height>200</height>
    </rect>
   </property>
@@ -49,8 +49,17 @@ border-radius: 15px;
 border-style: outset;
 border-width: 2px;</string>
       </property>
+      <property name="inputMask">
+       <string notr="true"/>
+      </property>
       <property name="text">
-       <string>API KEY</string>
+       <string notr="true" extracomment="API KEY">API KEY</string>
+      </property>
+      <property name="placeholderText">
+       <string extracomment="API KEY"/>
+      </property>
+      <property name="clearButtonEnabled">
+       <bool>true</bool>
       </property>
      </widget>
     </item>
@@ -73,14 +82,23 @@ border-width: 2px;</string>
         <pointsize>13</pointsize>
        </font>
       </property>
+      <property name="autoFillBackground">
+       <bool>false</bool>
+      </property>
       <property name="styleSheet">
        <string notr="true">background-color: rgb(255, 255, 255);
 border-radius: 15px;
 border-style: outset;
 border-width: 2px;</string>
       </property>
+      <property name="inputMethodHints">
+       <set>Qt::ImhSensitiveData</set>
+      </property>
       <property name="text">
-       <string>SECRET KEY</string>
+       <string notr="true">SECRET KEY</string>
+      </property>
+      <property name="clearButtonEnabled">
+       <bool>true</bool>
       </property>
      </widget>
     </item>

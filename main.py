@@ -2,7 +2,7 @@ import webbrowser
 from PyQt5 import uic, QtWidgets
 from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem
 import sqlite3
-from bot import Binance_bot
+from bot import BinanceData
 import os
 import cryptocode
 import pandas as pd
@@ -16,43 +16,43 @@ class Interface:
         ):
         
         
-        self.primeira_tela= uic.loadUi(first_window)
-        self.primeira_tela.pushButton.clicked.connect(self.login)
-        self.primeira_tela.label_3.setText("")
-        self.primeira_tela.lineEdit_2.setEchoMode(QtWidgets.QLineEdit.Password)
-        self.primeira_tela.pushButton_2.clicked.connect(self.open_git_on_web)
+        self.login_window= uic.loadUi(first_window)
+        self.login_window.pushButton.clicked.connect(self.login)
+        self.login_window.label_3.setText("")
+        self.login_window.lineEdit_2.setEchoMode(QtWidgets.QLineEdit.Password)
+        self.login_window.botao_git.clicked.connect(self.open_git_on_web)
         
         
-        self.segunda_tela = uic.loadUi(second_window)
-        self.segunda_tela.pushButton.clicked.connect(self.logout)
-        self.segunda_tela.botao_ver_saldo.clicked.connect(self.get_ballance_from_binance)
-        self.segunda_tela.botao_api.clicked.connect(self.add_api_key)
+        self.home_window = uic.loadUi(second_window)
+        self.home_window.pushButton.clicked.connect(self.logout)
+        self.home_window.botao_ver_saldo.clicked.connect(self.get_ballance_from_binance)
+        self.home_window.botao_api.clicked.connect(self.add_api_key)
         
 
-        self.tela_cadastro = uic.loadUi(register_window)
-        self.tela_cadastro.erro.setText("")
-        self.tela_cadastro.cadastrado.setText("")
-        self.tela_cadastro.botao_cadastro.clicked.connect(self.register_new_user)
+        self.registration_window = uic.loadUi(register_window)
+        self.registration_window.erro.setText("")
+        self.registration_window.cadastrado.setText("")
+        self.registration_window.botao_cadastro.clicked.connect(self.register_new_user)
 
 
-        self.tela_admin = uic.loadUi(admin_window)
-        self.tela_admin.botao_deslogar.clicked.connect(self.logout)
-        self.tela_admin.botao_cadastrar.clicked.connect(self.cadastro_tela)
+        self.admin_window = uic.loadUi(admin_window)
+        self.admin_window.botao_deslogar.clicked.connect(self.logout)
+        self.admin_window.botao_cadastrar.clicked.connect(self.cadastro_tela)
 
 
-        self.tela_erro = uic.loadUi(error_window)
-        self.tela_erro.label.setText("")
-        self.bot = Binance_bot()
+        self.error_window = uic.loadUi(error_window)
+        self.error_window.label.setText("")
+        self.binance_data = BinanceData()
 
 
-        self.tela_key = uic.loadUi(window_key)
-        self.tela_key.botao_config.clicked.connect(self.criar_env)
+        self.key_window = uic.loadUi(window_key)
+        self.key_window.botao_config.clicked.connect(self.criar_env)
 
         
-        self.tela_saldo = uic.loadUi(window_balance)
+        self.balances_window = uic.loadUi(window_balance)
         self.lista_janelas = [
-            self.segunda_tela, self.tela_cadastro,
-            self.tela_admin, self.tela_erro, self.tela_key, self.tela_saldo
+            self.home_window, self.registration_window,
+            self.admin_window, self.error_window, self.key_window, self.balances_window
             ]
     
     
@@ -65,7 +65,7 @@ class Interface:
       
         
     def start_first_window(self):
-        self.primeira_tela.show()
+        self.login_window.show()
    
    
     def open_git_on_web(self):
@@ -75,30 +75,31 @@ class Interface:
     
     
     def show_error_pop_up_window(self, erro):
-        self.start_window(self.tela_erro)
-        self.tela_erro.label.setText(f"{erro}")
+        self.close_window(self.error_window)
+        self.start_window(self.error_window)
+        self.error_window.label.setText(f"{erro}")
 
 
     def show_database_error_on_first_screen(self):
-        self.primeira_tela.label_3.setText(
+        self.login_window.label_3.setText(
             "Database ecxeption"
             )
 
 
     def erro_usuario_senha(self):
-        self.primeira_tela.label_3.setText(
+        self.login_window.label_3.setText(
             "username or password is invalid!"
             )
 
 
     def delete_env(self):
-        if self.bot.verify_existence_of_env() == True:
+        if self.binance_data.verify_existence_of_env() == True:
             os.remove(".env")
     
     
     def criar_env(self):
-        self.api = self.tela_key.apy_key.text()
-        self.secret = self.tela_key.secret_key.text()
+        self.api = self.key_window.apy_key.text()
+        self.secret = self.key_window.secret_key.text()
         api_text = (f'API_KEY = "{self.api}"\n')
         secret_text = (f'SECRET_KEY = "{self.secret}"')
         final_text = (api_text+secret_text)
@@ -107,16 +108,17 @@ class Interface:
         with open(env, 'w+') as writer:
             self.escritor = writer.writelines(final_text)
         
-        self.close_window(self.tela_key)
-        self.start_window(self.tela_erro)
+        self.close_window(self.key_window)
+        self.start_window(self.error_window)
         self.show_error_pop_up_window(
             "Api e secret key set with sucess!"
             )
 
 
     def colect_data_on_database(self):
-        self.username = self.primeira_tela.lineEdit.text()
-        self.banco = sqlite3.connect('banco_cadastro.db')
+        self.username = self.login_window.lineEdit.text()
+        self.banco = sqlite3.connect(
+            'banco_cadastro.db')
         self.cursor = self.banco.cursor()
         self.cursor.execute(
             "SELECT senha FROM cadastro WHERE login ='{}'".format(self.username)
@@ -126,7 +128,7 @@ class Interface:
     
     
     def error_incorrect_user(self):
-        self.primeira_tela.label_3.setText(
+        self.login_window.label_3.setText(
             "Incorrect login data!"
             )
 
@@ -145,7 +147,7 @@ class Interface:
 
 
     def verify_password(self):
-        password = self.primeira_tela.lineEdit_2.text()
+        password = self.login_window.lineEdit_2.text()
         decrypted_db_password = cryptocode.decrypt(
             f'{self.database_password[0][0]}','senha@123'
             )
@@ -163,8 +165,8 @@ class Interface:
     
     def validate_user(self):
         if self.verify_password() == True:
-            self.close_window(self.primeira_tela)
-            self.start_window(self.segunda_tela)
+            self.close_window(self.login_window)
+            self.start_window(self.home_window)
             self.name_of_user_on_screen()
             
             
@@ -184,9 +186,9 @@ class Interface:
             return erro
 
         if self.verify_user_admin() == True and self.verify_password() == True:
-            self.start_window(self.tela_admin)
+            self.start_window(self.admin_window)
             self.admin_name_on_screen()
-            self.close_window(self.primeira_tela)
+            self.close_window(self.login_window)
             
             
         else:        
@@ -199,38 +201,41 @@ class Interface:
     
     
     def verify_password_of_register(self):
-        self.senha_cadastro = self.tela_cadastro.senha.text()
-        self.confimacao_senha_cadastro = self.tela_cadastro.confirmar_senha.text()
+        self.password_register = self.registration_window.senha.text()
+        self.register_password_confirmation = self.registration_window.confirmar_senha.text()
 
         
-        if self.senha_cadastro == self.confimacao_senha_cadastro:
+        if self.password_register == self.register_password_confirmation:
             return True
         
         
         else:
-            self.tela_cadastro.erro.setText("The passwords are not the same!")
+            self.registration_window.erro.setText(
+                "The passwords are not the same!")
     
                 
     def register_the_new_user_on_database(self):
-        self.nome_cadastro = self.tela_cadastro.nome.text()
-        self.login_cadastro = self.tela_cadastro.login.text()
+        self.nome_cadastro = self.registration_window.nome.text()
+        self.login_cadastro = self.registration_window.login.text()
         self.senha_criptografada_do_cadastro = cryptocode.encrypt(
-            f'{self.senha_cadastro}', 'senha@123'
+            f'{self.password_register}', 'senha@123'
             )
         self.senha_criptograda_confimacao_do_cadastro = cryptocode.encrypt(
-            f'{self.confimacao_senha_cadastro}', 'senha@123'
+            f'{self.register_password_confirmation}', 'senha@123'
             )
         
         
         try:
-            self.banco = sqlite3.connect('banco_cadastro.db') 
+            self.banco = sqlite3.connect(
+                'banco_cadastro.db') 
             self.cursor = self.banco.cursor()
             self.cursor.execute(
                 "INSERT INTO cadastro VALUES ('"+self.nome_cadastro+"',"
                 f"'"+self.login_cadastro+"','"+self.senha_criptografada_do_cadastro+"')")
             self.banco.commit() 
             self.banco.close()
-            self.tela_cadastro.cadastrado.setText("User registered with sucess!")
+            self.registration_window.cadastrado.setText(
+                "User registered with sucess!")
             
             
         except sqlite3.Error as erro:
@@ -240,11 +245,11 @@ class Interface:
 
 
     def cadastro_tela(self):
-        self.start_window(self.tela_cadastro)
+        self.start_window(self.registration_window)
     
     
     def colect_data_from_excel(self):
-        self.bot.coins_with_balance_on_account()
+        self.binance_data.coins_with_balance_on_account()
        
         
     def read_excel(self):
@@ -268,9 +273,9 @@ class Interface:
         self.read_excel()
         df = self.read_excel()
         numero_linhas_df = self.get_number_of_lines_df(df)
-        self.tela_saldo.tableWidget.setRowCount(numero_linhas_df)
-        self.tela_saldo.tableWidget.setColumnCount(df.shape[1])
-        self.tela_saldo.tableWidget.setHorizontalHeaderLabels(df.columns)
+        self.balances_window.tableWidget.setRowCount(numero_linhas_df)
+        self.balances_window.tableWidget.setColumnCount(df.shape[1])
+        self.balances_window.tableWidget.setHorizontalHeaderLabels(df.columns)
         
 
         for row in df.iterrows():
@@ -284,58 +289,55 @@ class Interface:
                     value = '{0:0,.9f}'.format(value)
                     
                 table_item = QTableWidgetItem(str(value))
-                self.tela_saldo.tableWidget.setItem(row[0], col_index, table_item)
+                self.balances_window.tableWidget.setItem(row[0], col_index, table_item)
         
                     
     def get_ballance_from_binance(self):
-        if  self.bot.verify_existence_of_env() == True:
-            self.start_window(self.tela_saldo)
+        if  self.binance_data.verify_existence_of_env() == True:
+            self.start_window(self.balances_window)
             
-            if self.bot.test_env() == True:
+            if self.binance_data.test_env() == True:
                 self.colect_data_from_excel()
-                self.segunda_tela.label_resultado.setText("")
+                self.home_window.label_resultado.setText("")
                 self.generate_info_ballance()
                
                 
             else:
-                self.show_error_pop_up_window
-                (
+                self.show_error_pop_up_window(
                     'API or SECRET KEY was not set correctly, please do again the configuration'
                     )
                 
                 
         else:
-            self.start_window(self.tela_erro)
-            self.show_error_pop_up_window
-            (
+            self.start_window(self.error_window)
+            self.show_error_pop_up_window(
                 "Please set your API_KEY and SECRET_KEY on the home screen before proceeding!!"
                 )
 
 
     def add_api_key(self):
-        if self.bot.verify_existence_of_env() == True:
-            self.start_window(self.tela_erro)
-            self.show_error_pop_up_window
-            (
+        if self.binance_data.verify_existence_of_env() == True:
+            self.start_window(self.error_window)
+            self.show_error_pop_up_window(
                 "APY_KEY Already configured, logout and login again to add a new APY_KEY"
                 )
             
             
         else:
-            self.start_window(self.tela_key)
+            self.start_window(self.key_window)
         
         
     def clean_user_password(self):
-        self.primeira_tela.lineEdit.setText("")
-        self.primeira_tela.lineEdit_2.setText("")
+        self.login_window.lineEdit.setText("")
+        self.login_window.lineEdit_2.setText("")
        
             
     def admin_name_on_screen(self):
-        self.tela_admin.nome_user.setText(f"{self.username}")
+        self.admin_window.nome_user.setText(f"{self.username}")
         
         
     def name_of_user_on_screen(self):
-        self.segunda_tela.nome_user.setText(f"{self.username}")
+        self.home_window.nome_user.setText(f"{self.username}")
         
         
     def close_all_windows(self):
@@ -345,10 +347,11 @@ class Interface:
 
     def logout(self):
         self.close_all_windows()
-        self.start_window(self.primeira_tela)
+        self.start_window(self.login_window)
         self.clean_user_password()
         self.delete_env()
-        
+
+
         
 app=QtWidgets.QApplication([])
 iniciar_interface = Interface(

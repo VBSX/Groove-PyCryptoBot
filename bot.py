@@ -1,12 +1,10 @@
-from operator import ne
-from dotenv import load_dotenv
 import os
 from binance.client import Client
 from binance.enums import *
 import pandas as pd
 #from logon import Interface
 
-class Binance_bot():
+class BinanceData():
     def __init__(self):
         self.env = '.env'
              
@@ -32,16 +30,22 @@ class Binance_bot():
                     
                     
         else:
-            print("erro sem env")
+            
+            
+            return False
+            
             
     def verify_existence_of_env(self):
         if os.path.exists(self.env):
+            
             
             return True
       
     def verify_api_key(self):
         c = self.open_the_env()[0]
         d = self.open_the_env()[1]
+        
+        
         if "API_KEY" in c and "SECRET_KEY" in d:
             
             
@@ -65,7 +69,6 @@ class Binance_bot():
     def get_binance_data(self):
         api_key = self.get_api_key()
         secret_key = self.get_secret_key()
-        
         client = Client(api_key, secret_key)
         informations_of_account = client.get_account()
         
@@ -78,6 +81,7 @@ class Binance_bot():
             
             
         return self.leitor
+    
     
     def verify_content_of_env(self):
         if self.verify_existence_of_env() == True:
@@ -130,10 +134,13 @@ class Binance_bot():
             api_key = self.get_api_key()
             secret_key = self.get_secret_key()
             
+            
             try:
                 client = Client(api_key, secret_key)
                 client.get_account()
                 return True
+               
+               
                 
             except:
                 
@@ -142,9 +149,20 @@ class Binance_bot():
             
             
         else:
+            
+            
             return False
+        
+class BinanceBot(BinanceData):
+    def __init__(self):
+        pass
+    
 
-# bot = Binance_bot()
+    
+    
+    
+    
+# bot = BinanceDataGet()
 # bot.verify_content_of_env()
 # bot.moedas_com_saldo()
 

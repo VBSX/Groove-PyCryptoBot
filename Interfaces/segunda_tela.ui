@@ -98,10 +98,7 @@
          <property name="frameShadow">
           <enum>QFrame::Raised</enum>
          </property>
-         <layout class="QHBoxLayout" name="horizontalLayout">
-          <property name="spacing">
-           <number>0</number>
-          </property>
+         <layout class="QGridLayout" name="gridLayout_3">
           <property name="leftMargin">
            <number>0</number>
           </property>
@@ -109,12 +106,12 @@
            <number>0</number>
           </property>
           <property name="rightMargin">
-           <number>0</number>
+           <number>12</number>
           </property>
           <property name="bottomMargin">
            <number>0</number>
           </property>
-          <item>
+          <item row="0" column="0">
            <widget class="QLabel" name="label">
             <property name="minimumSize">
              <size>
@@ -132,11 +129,11 @@
             </property>
            </widget>
           </item>
-          <item>
+          <item row="0" column="1" alignment="Qt::AlignHCenter">
            <widget class="QLabel" name="nome_user">
             <property name="minimumSize">
              <size>
-              <width>200</width>
+              <width>168</width>
               <height>23</height>
              </size>
             </property>
@@ -154,44 +151,13 @@
             <property name="text">
              <string/>
             </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
            </widget>
           </item>
-          <item>
+          <item row="0" column="2">
            <widget class="QPushButton" name="pushButton">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>29</height>
-             </size>
-            </property>
-            <property name="font">
-             <font>
-              <pointsize>13</pointsize>
-             </font>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">background-color: rgb(255, 255, 255);
-border-radius: 15px;
-border-style: outset;
-color: rgb(255, 0, 0);
-margin-right: 10px;</string>
-            </property>
-            <property name="text">
-             <string>Deslogar</string>
-            </property>
-            <property name="autoDefault">
-             <bool>false</bool>
-            </property>
-            <property name="default">
-             <bool>false</bool>
-            </property>
-            <property name="flat">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="botao_api">
             <property name="minimumSize">
              <size>
               <width>89</width>
@@ -204,10 +170,31 @@ margin-right: 10px;</string>
              </font>
             </property>
             <property name="styleSheet">
-             <string notr="true">background-color: rgb(255, 255, 255);</string>
+             <string notr="true">background-color: rgb(129, 135, 255);</string>
             </property>
             <property name="text">
-             <string>Adicionar Key Api</string>
+             <string>LOGOUT</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="3">
+           <widget class="QPushButton" name="botao_api">
+            <property name="minimumSize">
+             <size>
+              <width>104</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>13</pointsize>
+             </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">background-color: rgb(129, 135, 255);</string>
+            </property>
+            <property name="text">
+             <string>ADICIONAR API KEY</string>
             </property>
            </widget>
           </item>
