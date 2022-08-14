@@ -2,7 +2,7 @@ import webbrowser
 from PyQt5 import uic, QtWidgets
 from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem
 import sqlite3
-from bot import BinanceData
+from bot import BinanceApi
 import os
 import cryptocode
 import pandas as pd
@@ -42,7 +42,7 @@ class Interface:
 
         self.error_window = uic.loadUi(error_window)
         self.error_window.label.setText("")
-        self.binance_data = BinanceData()
+        self.binance_data = BinanceApi()
 
 
         self.key_window = uic.loadUi(window_key)
@@ -352,14 +352,14 @@ class Interface:
         self.delete_env()
 
 
-        
-app=QtWidgets.QApplication([])
-iniciar_interface = Interface(
-    f"Interfaces/Tela_Inicial.ui", "Interfaces/segunda_tela.ui", "Interfaces/tela_cadastro.ui",
-  "Interfaces/tela_admin.ui", "Interfaces/tela_erro.ui",
-  "Interfaces/tela_key.ui", "Interfaces/tela_saldo.ui"
-  )
-iniciar_interface.start_first_window()
-app.exec()
-# iniciar_interface.ver_saldo()
+if __name__ == "__main__":   
+    app=QtWidgets.QApplication([])
+    iniciar_interface = Interface(
+        f"Interfaces/Tela_Inicial.ui", "Interfaces/segunda_tela.ui", "Interfaces/tela_cadastro.ui",
+    "Interfaces/tela_admin.ui", "Interfaces/tela_erro.ui",
+    "Interfaces/tela_key.ui", "Interfaces/tela_saldo.ui"
+    )
+    iniciar_interface.start_first_window()
+    app.exec()
+    # iniciar_interface.ver_saldo()
 
