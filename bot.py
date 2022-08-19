@@ -4,7 +4,7 @@ from binance.client import Client
 from binance.enums import *
 import pandas as pd
 from datetime import datetime
-import threading
+
 
 class BinanceApi():
     def __init__(self):
@@ -236,11 +236,10 @@ class BinanceBot(BinanceApi):
         while price_of_coin > desired_price:
             sleep(10)
             print('\n desired price: ', desired_price, '\n')
-            
             price_of_coin = float(bot.get_realtime_price_of_coins(pair_of_coin))
             print(f'\n price update: {price_of_coin} at {self.get_time()} \n')
-        
-        
+            
+            
         return price_of_coin
         
 
@@ -257,15 +256,11 @@ if __name__ == "__main__":
     price_bought = bot.wait_price_to_buy(price_of_coin, desired_price)
     print('buy coin')
     print(f'coin buyed for {price_bought} at {bot.get_time()}')
-    # threading.Thread(target=t, args=(1, 200)).start()
-    
-    
-    
+
     # bot.verify_content_of_env()
     # bot.moedas_com_saldo()
 
     # c = bot.test_env()
     # print(c)
-
-
+   
     #bot.moedas_com_saldo()

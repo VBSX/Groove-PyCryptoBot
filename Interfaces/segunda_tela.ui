@@ -319,20 +319,6 @@ color: rgb(0, 0, 0);</string>
                 </widget>
                </item>
                <item>
-                <widget class="QLabel" name="label_resultado_2">
-                 <property name="text">
-                  <string>TextLabel</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLabel" name="label_icone_2">
-                 <property name="text">
-                  <string>TextLabel</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
                 <widget class="QPushButton" name="botao_2">
                  <property name="maximumSize">
                   <size>

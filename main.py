@@ -1,12 +1,222 @@
 import webbrowser
 from PyQt5 import uic, QtWidgets
-from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem
+from PyQt5.QtCore import pyqtSignal, Qt
+from PyQt5.QtWidgets import QTableWidgetItem
 import sqlite3
 from bot import BinanceApi
 import os
 import cryptocode
 import pandas as pd
 
+class LoginInterface(QtWidgets.QMainWindow):
+    def __init__(self):
+        super(LoginInterface, self).__init__()
+        close_signal = pyqtSignal()
+        
+        self.login_window= uic.loadUi("Interfaces/Tela_Inicial.ui")
+        self.clean_user_password()
+
+        self.login_window.pushButton.clicked.connect(self.login)
+        self.login_window.label_3.setText("")
+        self.login_window.lineEdit_2.setEchoMode(QtWidgets.QLineEdit.Password)
+        
+        self.login_window.botao_git.clicked.connect(self.open_git_on_web)
+        self.database = Database()
+        self.verifier = Verifier()
+        self.login_window.show()
+        
+    
+    def login(self):
+        password = self.login_window.lineEdit_2.text()
+        username = self.login_window.lineEdit.text()
+        database_password = self.database.colect_password_database(username)
+
+
+        if self.verifier.verify_user_admin(username) == True and self.verifier.verify_password(password,database_password) == True:
+            self.login_window.close()
+            AdminInterface()
+            
+            
+        else:
+            if self.verifier.verify_password(password,database_password) == True:
+                # self.login_window.close()
+                HomeInterface(self).name_user_on_screen(username)
+                
+          
+            else:
+                self.show_dialog("username or password is invalid!")
+                
+            
+
+    def show_dialog(self, text):
+        QtWidgets.QMessageBox.about(self, 'DIALOG', text)
+            
+
+    def open_git_on_web(self):
+        webbrowser.open_new_tab(
+        'https://github.com/vbsx'
+        )
+
+    
+    def clean_user_password(self):
+        self.login_window.lineEdit.setText("")
+        self.login_window.lineEdit_2.setText("")
+       
+
+class HomeInterface(QtWidgets.QWidget):
+    def __init__(self , *args, **kwargs):
+        super(HomeInterface, self).__init__(*args, **kwargs)
+        self.home_window = uic.loadUi('Interfaces/segunda_tela.ui')
+        # self.home_window.pushButton.clicked.connect(self.logout)
+        # self.home_window.botao_ver_saldo.clicked.connect(self.get_ballance_from_binance)
+        # self.home_window.botao_api.clicked.connect(self.add_api_key)
+        self.home_window.show()
+
+    
+    def close_me(self):
+        self.home_window.close()
+
+
+    def name_user_on_screen(self, username):
+        self.home_window.nome_user.setText(f"{username}")
+        
+        
+class AdminInterface(QtWidgets.QWidget):
+    def __init__(self, *args, **kwargs):
+        super(AdminInterface, self).__init__(*args, **kwargs)
+
+        self.admin_window = uic.loadUi("Interfaces/tela_admin.ui")
+        # self.admin_window.botao_deslogar.clicked.connect(self.logout)
+        self.admin_window.botao_cadastrar.clicked.connect(RegisterInterface)
+        self.admin_window.show()
+     
+
+class RegisterInterface(QtWidgets.QWidget):
+    def __init__(self, *args, **kwargs):
+        super(RegisterInterface, self).__init__(*args, **kwargs)
+        
+        self.verifier = Verifier()
+        self.database = Database()
+        
+        self.registration_window = uic.loadUi("Interfaces/tela_cadastro.ui")
+        self.registration_window.erro.setText("")
+        self.registration_window.cadastrado.setText("")
+        self.registration_window.botao_cadastro.clicked.connect(self.register_new_user)
+        
+        self.password_register = self.registration_window.senha.text()
+        self.register_password_confirmation = self.registration_window.confirmar_senha.text()
+        self.nome_cadastro = self.registration_window.nome.text()
+        self.login_cadastro = self.registration_window.login.text()
+        
+        self.registration_window.show()
+        
+    def register_new_user(self):
+        if self.verifier.verify_password_of_register(self.password_register, self.register_password_confirmation) == True:
+            result = self.database.register_the_new_user_on_database(self.nome_cadastro, self.login_cadastro, self.password_register, self.register_password_confirmation)
+            self.show_dialog(result)
+    
+    
+    def show_dialog(self, text):
+        QtWidgets.QMessageBox.about(self, 'DIALOG', text)
+            
+        
+class Database():
+    def __init__(self):
+        self.banco = sqlite3.connect(
+            'banco_cadastro.db')
+        self.cursor = self.banco.cursor()
+
+
+    def colect_password_database(self, username):
+        
+        self.cursor.execute(
+            "SELECT senha FROM cadastro WHERE login ='{}'".format(username)
+            )
+        
+        database_password = self.cursor.fetchall()
+
+        return database_password
+    
+    
+    def close_db(self):
+        self.banco.close()
+        
+    def register_the_new_user_on_database(self, nome_cadastro, login_cadastro, password_register, register_password_confirmation):
+        senha_criptografada_do_cadastro = cryptocode.encrypt(
+            f'{password_register}', 'senha@123'
+            )
+        senha_criptograda_confimacao_do_cadastro = cryptocode.encrypt(
+            f'{register_password_confirmation}', 'senha@123'
+            )
+        
+        
+        try:
+            self.banco = sqlite3.connect(
+                'banco_cadastro.db') 
+            self.cursor = self.banco.cursor()
+            self.cursor.execute(
+                "INSERT INTO cadastro VALUES ('"+nome_cadastro+"',"
+                f"'"+login_cadastro+"','"+senha_criptografada_do_cadastro+"')")
+            self.banco.commit()
+            
+            return f"User {nome_cadastro} registered with sucess!"
+            
+            
+        except sqlite3.Error as erro:
+            
+            
+            return erro
+
+
+        
+        
+class Verifier():
+    def __init__(self) -> None:
+        pass
+    
+    def verify_user_admin(self, username):
+        if username == "admin":
+            
+            
+            return True
+
+    def verify_password(self, password, database_password):        
+        try:
+                    
+            decrypted_db_password = cryptocode.decrypt(
+            f'{database_password[0][0]}','senha@123'
+            )
+        
+            
+            if password == decrypted_db_password:
+                
+                return True
+            
+            
+        except:
+            return False
+    
+       
+    def validate_user(self):
+        if self.verify_password() == True:
+            
+         
+            # self.name_of_user_on_screen()
+            pass
+            
+        else:
+            
+        
+            return False
+        
+    def verify_password_of_register(self, password_register, register_password_confirmation):
+        if password_register == register_password_confirmation:
+            
+            
+            return True
+        
+    
+        
 
 class Interface:
     def __init__(
@@ -14,31 +224,6 @@ class Interface:
         register_window, admin_window, error_window,
         window_key, window_balance
         ):
-        
-        
-        self.login_window= uic.loadUi(first_window)
-        self.login_window.pushButton.clicked.connect(self.login)
-        self.login_window.label_3.setText("")
-        self.login_window.lineEdit_2.setEchoMode(QtWidgets.QLineEdit.Password)
-        self.login_window.botao_git.clicked.connect(self.open_git_on_web)
-        
-        
-        self.home_window = uic.loadUi(second_window)
-        self.home_window.pushButton.clicked.connect(self.logout)
-        self.home_window.botao_ver_saldo.clicked.connect(self.get_ballance_from_binance)
-        self.home_window.botao_api.clicked.connect(self.add_api_key)
-        
-
-        self.registration_window = uic.loadUi(register_window)
-        self.registration_window.erro.setText("")
-        self.registration_window.cadastrado.setText("")
-        self.registration_window.botao_cadastro.clicked.connect(self.register_new_user)
-
-
-        self.admin_window = uic.loadUi(admin_window)
-        self.admin_window.botao_deslogar.clicked.connect(self.logout)
-        self.admin_window.botao_cadastrar.clicked.connect(self.cadastro_tela)
-
 
         self.error_window = uic.loadUi(error_window)
         self.error_window.label.setText("")
@@ -67,13 +252,6 @@ class Interface:
     def start_first_window(self):
         self.login_window.show()
    
-   
-    def open_git_on_web(self):
-        webbrowser.open_new_tab(
-            'https://github.com/vbsx'
-            )
-    
-    
     def show_error_pop_up_window(self, erro):
         self.close_window(self.error_window)
         self.start_window(self.error_window)
@@ -115,134 +293,12 @@ class Interface:
             )
 
 
-    def colect_data_on_database(self):
-        self.username = self.login_window.lineEdit.text()
-        self.banco = sqlite3.connect(
-            'banco_cadastro.db')
-        self.cursor = self.banco.cursor()
-        self.cursor.execute(
-            "SELECT senha FROM cadastro WHERE login ='{}'".format(self.username)
-            )
-        self.database_password = self.cursor.fetchall()
-        self.banco.close()
-    
-    
     def error_incorrect_user(self):
         self.login_window.label_3.setText(
             "Incorrect login data!"
             )
 
-
-    def verify_user_admin(self):
-        if self.username == "admin":
-            
-            
-            return True
-        
-        
-        else:
-            
-            
-            return False
-
-
-    def verify_password(self):
-        password = self.login_window.lineEdit_2.text()
-        decrypted_db_password = cryptocode.decrypt(
-            f'{self.database_password[0][0]}','senha@123'
-            )
-        
-        
-        try:
-            
-            
-            if password == decrypted_db_password:
-                return True
-            
-            
-        except:
-            return self.error_incorrect_user()
-    
-    def validate_user(self):
-        if self.verify_password() == True:
-            self.close_window(self.login_window)
-            self.start_window(self.home_window)
-            self.name_of_user_on_screen()
-            
-            
-        else:
-            
-            
-            return self.error_incorrect_user()
-
-    def login(self):
-        try:
-            self.colect_data_on_database()
-            
-            
-        except sqlite3.Error as erro:
-            
-            
-            return erro
-
-        if self.verify_user_admin() == True and self.verify_password() == True:
-            self.start_window(self.admin_window)
-            self.admin_name_on_screen()
-            self.close_window(self.login_window)
-            
-            
-        else:        
-            self.validate_user()
-
-    def register_new_user(self):
-        self.verify_password_of_register()
-        if self.verify_password_of_register() == True:
-            self.register_the_new_user_on_database()
-    
-    
-    def verify_password_of_register(self):
-        self.password_register = self.registration_window.senha.text()
-        self.register_password_confirmation = self.registration_window.confirmar_senha.text()
-
-        
-        if self.password_register == self.register_password_confirmation:
-            return True
-        
-        
-        else:
-            self.registration_window.erro.setText(
-                "The passwords are not the same!")
-    
-                
-    def register_the_new_user_on_database(self):
-        self.nome_cadastro = self.registration_window.nome.text()
-        self.login_cadastro = self.registration_window.login.text()
-        self.senha_criptografada_do_cadastro = cryptocode.encrypt(
-            f'{self.password_register}', 'senha@123'
-            )
-        self.senha_criptograda_confimacao_do_cadastro = cryptocode.encrypt(
-            f'{self.register_password_confirmation}', 'senha@123'
-            )
-        
-        
-        try:
-            self.banco = sqlite3.connect(
-                'banco_cadastro.db') 
-            self.cursor = self.banco.cursor()
-            self.cursor.execute(
-                "INSERT INTO cadastro VALUES ('"+self.nome_cadastro+"',"
-                f"'"+self.login_cadastro+"','"+self.senha_criptografada_do_cadastro+"')")
-            self.banco.commit() 
-            self.banco.close()
-            self.registration_window.cadastrado.setText(
-                "User registered with sucess!")
-            
-            
-        except sqlite3.Error as erro:
-            
-            
-            return erro
-
+      
 
     def cadastro_tela(self):
         self.start_window(self.registration_window)
@@ -327,10 +383,7 @@ class Interface:
             self.start_window(self.key_window)
         
         
-    def clean_user_password(self):
-        self.login_window.lineEdit.setText("")
-        self.login_window.lineEdit_2.setText("")
-       
+
             
     def admin_name_on_screen(self):
         self.admin_window.nome_user.setText(f"{self.username}")
@@ -354,12 +407,13 @@ class Interface:
 
 if __name__ == "__main__":   
     app=QtWidgets.QApplication([])
-    iniciar_interface = Interface(
-        f"Interfaces/Tela_Inicial.ui", "Interfaces/segunda_tela.ui", "Interfaces/tela_cadastro.ui",
-    "Interfaces/tela_admin.ui", "Interfaces/tela_erro.ui",
-    "Interfaces/tela_key.ui", "Interfaces/tela_saldo.ui"
-    )
-    iniciar_interface.start_first_window()
+    # iniciar_interface = Interface(
+    #     f ,
+    # , "Interfaces/tela_erro.ui",
+    # "Interfaces/tela_key.ui", "Interfaces/tela_saldo.ui"
+    # )
+    login = LoginInterface()
+
     app.exec()
     # iniciar_interface.ver_saldo()
 
