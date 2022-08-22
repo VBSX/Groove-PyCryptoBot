@@ -1,55 +1,57 @@
-import webbrowser
-from PyQt5 import uic, QtWidgets
-from PyQt5.QtCore import pyqtSignal, Qt
-from PyQt5.QtWidgets import QTableWidgetItem
+# from PyQt5 import uic, QtWidgets
+# from PyQt5.QtCore import pyqtSignal
+# from PyQt5.QtWidgets import QTableWidgetItem, QApplication, QMainWindow, QLineEdit, QWidget
+###
+from Interfaces.UiAdmin import Ui_Admin
+from Interfaces.UiHome import Ui_Home
+from Interfaces.UiLogin import Ui_Login
+from Interfaces.UiBalance import Ui_Balance
+from Interfaces.UiRegister import Ui_Register
+from Interfaces.UiKey import Ui_Key
+##
+from PySide6.QtWidgets import QWidget, QTableWidgetItem, QApplication, QMainWindow, QLineEdit, QMessageBox, QDialog
 import sqlite3
 from bot import BinanceApi
 import os
 import cryptocode
 import pandas as pd
+import sys
+import webbrowser
 
-class LoginInterface(QtWidgets.QMainWindow):
-    def __init__(self):
-        super(LoginInterface, self).__init__()
-        close_signal = pyqtSignal()
+
+class LoginInterface(QDialog):
+    def __init__(self,parent=None, *args, **kwargs):
+        super(LoginInterface, self).__init__(parent=parent, *args, **kwargs)
+        self.login_window = Ui_Login()
+        self.login_window.setupUi(self)
         
-        self.login_window= uic.loadUi("Interfaces/Tela_Inicial.ui")
+        # close_signal = pyqtSignal()
+        self.setWindowTitle('Login')
         self.clean_user_password()
 
-        self.login_window.pushButton.clicked.connect(self.login)
+        
         self.login_window.label_3.setText("")
-        self.login_window.lineEdit_2.setEchoMode(QtWidgets.QLineEdit.Password)
+        self.login_window.lineEdit_2.setEchoMode(QLineEdit.Password)
         
         self.login_window.botao_git.clicked.connect(self.open_git_on_web)
         self.database = Database()
         self.verifier = Verifier()
-        self.login_window.show()
+        self.show()
+        
         
     
-    def login(self):
-        password = self.login_window.lineEdit_2.text()
-        username = self.login_window.lineEdit.text()
-        database_password = self.database.colect_password_database(username)
+    def clicker(self, login):
+        self.login_window.pushButton.clicked.connect(login)
 
-
-        if self.verifier.verify_user_admin(username) == True and self.verifier.verify_password(password,database_password) == True:
-            self.login_window.close()
-            AdminInterface()
-            
-            
-        else:
-            if self.verifier.verify_password(password,database_password) == True:
-                # self.login_window.close()
-                HomeInterface(self).name_user_on_screen(username)
-                
-          
-            else:
-                self.show_dialog("username or password is invalid!")
-                
-            
-
+    def get_pass(self):
+        passw = self.login_window.lineEdit_2.text()
+        return passw
+    
+    def get_username(self):
+        user = self.login_window.lineEdit.text()
+        return user
     def show_dialog(self, text):
-        QtWidgets.QMessageBox.about(self, 'DIALOG', text)
+       QMessageBox.about(self, 'DIALOG', text)
             
 
     def open_git_on_web(self):
@@ -63,14 +65,15 @@ class LoginInterface(QtWidgets.QMainWindow):
         self.login_window.lineEdit_2.setText("")
        
 
-class HomeInterface(QtWidgets.QWidget):
+class HomeInterface(QMainWindow):
     def __init__(self , *args, **kwargs):
         super(HomeInterface, self).__init__(*args, **kwargs)
-        self.home_window = uic.loadUi('Interfaces/segunda_tela.ui')
+        self.home_window = Ui_Home()
+        self.home_window.setupUi(self)
         # self.home_window.pushButton.clicked.connect(self.logout)
         # self.home_window.botao_ver_saldo.clicked.connect(self.get_ballance_from_binance)
         # self.home_window.botao_api.clicked.connect(self.add_api_key)
-        self.home_window.show()
+        self.show()
 
     
     def close_me(self):
@@ -81,24 +84,24 @@ class HomeInterface(QtWidgets.QWidget):
         self.home_window.nome_user.setText(f"{username}")
         
         
-class AdminInterface(QtWidgets.QWidget):
-    def __init__(self, *args, **kwargs):
-        super(AdminInterface, self).__init__(*args, **kwargs)
-
-        self.admin_window = uic.loadUi("Interfaces/tela_admin.ui")
+class AdminInterface(QMainWindow):
+    def __init__(self,parent=None, *args, **kwargs):
+        super(AdminInterface, self).__init__(parent=parent, *args, **kwargs)
+        # self.admin_window = uic.loadUi("Interfaces/tela_admin.ui")
+        ui = Ui_Admin()
         # self.admin_window.botao_deslogar.clicked.connect(self.logout)
-        self.admin_window.botao_cadastrar.clicked.connect(RegisterInterface)
-        self.admin_window.show()
+        # self.admin_window.botao_cadastrar.clicked.connect(RegisterInterface)
+        ui.setupUi(self)
+        self.show()
      
 
-class RegisterInterface(QtWidgets.QWidget):
+class RegisterInterface(QWidget):
     def __init__(self, *args, **kwargs):
         super(RegisterInterface, self).__init__(*args, **kwargs)
-        
+        self.home_window = Ui_Register()
+        self.home_window.setupUi(self)
         self.verifier = Verifier()
         self.database = Database()
-        
-        self.registration_window = uic.loadUi("Interfaces/tela_cadastro.ui")
         self.registration_window.erro.setText("")
         self.registration_window.cadastrado.setText("")
         self.registration_window.botao_cadastro.clicked.connect(self.register_new_user)
@@ -117,7 +120,7 @@ class RegisterInterface(QtWidgets.QWidget):
     
     
     def show_dialog(self, text):
-        QtWidgets.QMessageBox.about(self, 'DIALOG', text)
+        QMessageBox.about(self, 'DIALOG', text)
             
         
 class Database():
@@ -406,14 +409,34 @@ class Interface:
 
 
 if __name__ == "__main__":   
-    app=QtWidgets.QApplication([])
-    # iniciar_interface = Interface(
-    #     f ,
-    # , "Interfaces/tela_erro.ui",
-    # "Interfaces/tela_key.ui", "Interfaces/tela_saldo.ui"
-    # )
-    login = LoginInterface()
+    app = QApplication(sys.argv)
+    
+    s = LoginInterface()
+    database=Database()
+    verifier = Verifier()
+    
+    def login():
+        password = s.get_pass()
+        username = s.get_username()
+        database_password = database.colect_password_database(username)
 
+
+        if verifier.verify_user_admin(username) == True and verifier.verify_password(password,database_password) == True:
+            # self.close()
+            AdminInterface()
+            
+            
+        else:
+            if verifier.verify_password(password,database_password) == True:
+                # self.login_window.close()
+                HomeInterface().name_user_on_screen(username)
+                
+          
+            else:
+                # show_dialog("username or password is invalid!")
+                pass
+                
+    s.clicker(login)
     app.exec()
     # iniciar_interface.ver_saldo()
 
